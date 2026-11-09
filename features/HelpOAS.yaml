@@ -4,9 +4,9 @@ info:
   version: 1.0.0
   description: OpenAPI contract for the Help API.
 servers:
-  - url: https://api.example.com/api/v1
+  - url: https://api.example.com/api
     description: For CI/CD environment
-  - url: http://localhost:3000/api/v1
+  - url: http://localhost:3000/api
     description: For local development environment
 security:
   - bearerAuth: []
@@ -14,7 +14,7 @@ tags:
   - name: Help
     description: Help API operations.
 paths:
-  /Help/v1:
+  /Help:
     get:
       tags: [Help]
       operationId: getHelp
@@ -22,10 +22,25 @@ paths:
       responses:
         '200':
           description: Help information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelpResponse'
+              example:
+                Id: 1
+                Subject: Help with my account
     post:
       tags: [Help]
       operationId: postHelp
       summary: Submit a help request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HelpRequest'
+            example:
+              Subject: Help with my account
       responses:
         '200':
           description: Help request processed successfully.
@@ -36,3 +51,28 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: OAuth 2.0 / OIDC bearer access token (organization standard).
+  schemas:
+    HelpResponse:
+      type: object
+      description: Help item returned by the API.
+      required: [Id, Subject]
+      properties:
+        Id:
+          type: integer
+          format: int32
+          readOnly: true
+          description: Identifier of the help item.
+          example: 1
+        Subject:
+          type: string
+          description: Subject of the help item.
+          example: Help with my account
+    HelpRequest:
+      type: object
+      description: Payload for submitting a help request.
+      required: [Subject]
+      properties:
+        Subject:
+          type: string
+          description: Subject of the help request.
+          example: Help with my account
