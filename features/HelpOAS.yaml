@@ -14,17 +14,17 @@ tags:
   - name: Help
     description: Help API operations.
 paths:
-  /hello/v1:
+  /Help/v1:
     get:
       tags: [Help]
-      operationId: getHello
+      operationId: getHelp
       summary: Get help
       responses:
         '200':
           description: Help information retrieved successfully.
     post:
       tags: [Help]
-      operationId: postHello
+      operationId: postHelp
       summary: Submit a help request
       responses:
         '200':
