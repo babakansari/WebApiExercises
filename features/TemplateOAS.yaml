@@ -3,7 +3,7 @@ info:
   title: OpenAPI Specification Template
   version: 1.0.0
   description: >-
-    Template for creating an OpenAPI specification. The Help operations,
+    Template for creating an OpenAPI specification. The sample resource operations,
     schemas, server URLs, and security configuration are samples and do not
     describe a real API. Copy this file and replace or adapt the metadata,
     servers, security, tags, paths, and components for your API, following
@@ -16,41 +16,41 @@ servers:
 security:
   - bearerAuth: []
 tags:
-  - name: Help
-    description: Sample Help operations; replace with your API's operations.
+  - name: SampleResources
+    description: Sample resource operations; replace with your API's operations.
 paths:
-  /Help:
+  /sample-resources:
     get:
-      tags: [Help]
-      operationId: getHelp
-      summary: 'Sample: Get help'
+      tags: [SampleResources]
+      operationId: getSampleResources
+      summary: 'Sample: Get sample resources'
       description: Sample GET operation; replace or adapt it for your API.
       responses:
         '200':
-          description: Help information retrieved successfully.
+          description: Sample resources retrieved successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HelpResponse'
+                $ref: '#/components/schemas/SampleResourceResponse'
               example:
-                Id: 1
-                Subject: Help with my account
+                id: 1
+                name: Example resource
     post:
-      tags: [Help]
-      operationId: postHelp
-      summary: 'Sample: Submit a help request'
+      tags: [SampleResources]
+      operationId: createSampleResource
+      summary: 'Sample: Create a sample resource'
       description: Sample POST operation; replace or adapt it for your API.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/HelpRequest'
+              $ref: '#/components/schemas/SampleResourceRequest'
             example:
-              Subject: Help with my account
+              name: Example resource
       responses:
         '200':
-          description: Help request processed successfully.
+          description: Sample resource created successfully.
 components:
   securitySchemes:
     bearerAuth:
@@ -59,27 +59,27 @@ components:
       bearerFormat: JWT
       description: Sample OAuth 2.0 / OIDC bearer access token; adapt for your API.
   schemas:
-    HelpResponse:
+    SampleResourceResponse:
       type: object
-      description: Sample help item returned by the API.
-      required: [Id, Subject]
+      description: Sample resource returned by the API.
+      required: [id, name]
       properties:
-        Id:
+        id:
           type: integer
           format: int32
           readOnly: true
-          description: Identifier of the help item.
+          description: Identifier of the sample resource.
           example: 1
-        Subject:
+        name:
           type: string
-          description: Subject of the help item.
-          example: Help with my account
-    HelpRequest:
+          description: Name of the sample resource.
+          example: Example resource
+    SampleResourceRequest:
       type: object
-      description: Sample payload for submitting a help request.
-      required: [Subject]
+      description: Sample payload for creating a resource.
+      required: [name]
       properties:
-        Subject:
+        name:
           type: string
-          description: Subject of the help request.
-          example: Help with my account
+          description: Name of the sample resource.
+          example: Example resource
