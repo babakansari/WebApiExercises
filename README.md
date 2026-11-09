@@ -16,28 +16,28 @@ This repo has two ways to build an ASP.NET Core Web API:
 ## Option 1: Generate from an existing OAS YAML file
 
 ### 1. Write or update the OAS file
-Create an OAS 3.0.3 YAML file for the feature, e.g. [`GroundEventOAS.yaml`](./GroundEventOAS.yaml).
-In Copilot Chat, the [`/api-oas`](./.github/skills/api-oas/SKILL.md) skill can write it from a requirements document such as [`GroundEventReadme.md`](./GroundEventReadme.md). The skill follows [`API-Design-System.yaml`](./API-Design-System.yaml).
+Create an OAS 3.0.3 YAML file for the feature in [`features/`](./features), e.g. [`features/GroundEventOAS.yaml`](./features/GroundEventOAS.yaml).
+In Copilot Chat, the [`/api-oas`](./.github/skills/api-oas/SKILL.md) skill can write it from a requirements document such as [`features/GroundEventReadme.md`](./features/GroundEventReadme.md). The skill follows [`API-Design-System.yaml`](./API-Design-System.yaml).
 
 ### 2. Run the script
 ```bash
-./generate-webapi.sh GroundEventOAS.yaml
+./generate-webapi.sh features/GroundEventOAS.yaml
 ```
 The script:
 - validates the spec;
-- works out the package name from the file name (`GroundEventOAS.yaml` → `GroundEvent.Api`);
+- works out the package name from the file name, ignoring the folder (`features/GroundEventOAS.yaml` → `GroundEvent.Api`);
 - generates the project into `APIs/<PackageName>`.
 
 You can override the package name and output folder:
 ```bash
 ./generate-webapi.sh <oas-file> [packageName] [outputDir]
-./generate-webapi.sh GroundEventOAS.yaml MyCompany.GroundEvent.Api APIs/MyCompany.GroundEvent.Api
+./generate-webapi.sh features/GroundEventOAS.yaml MyCompany.GroundEvent.Api APIs/MyCompany.GroundEvent.Api
 ```
 
 The script runs this command, which you can also run directly:
 ```bash
 openapi-generator-cli generate \
-  -i GroundEventOAS.yaml \
+  -i features/GroundEventOAS.yaml \
   -g aspnetcore \
   -o APIs/GroundEvent.Api \
   -t templates/aspnetcore \
@@ -92,8 +92,8 @@ the extra `[ApiVersion]`/`[MapToApiVersion]` values and add a matching `SwaggerD
 
 ### 3. Build and run
 ```bash
-dotnet build APIs/GroundEvent.Api/src/GroundEvent.Api/GroundEvent.Api.csproj
-dotnet run   --project APIs/GroundEvent.Api/src/GroundEvent.Api/GroundEvent.Api.csproj
+dotnet build APIs/GroundEvent.Api/src/GroundEvent.Api.csproj
+dotnet run   --project APIs/GroundEvent.Api/src/GroundEvent.Api.csproj
 ```
 Swagger UI is then available at `/openapi` on the URL printed in the console.
 
@@ -105,8 +105,8 @@ Replace the sample bodies in the generated controllers (`Controllers/*Api.cs`) w
 The agent is the more convenient option: **you don't have to write the OAS YAML file yourself.** Describe the API feature, or point at a requirements file, and it works without stopping for confirmation:
 
 1. **Checks the tools:** detects the installed generator, Java and .NET SDK versions.
-2. **Writes the contract:** creates the OAS YAML file using the [`api-oas`](./.github/skills/api-oas/SKILL.md) skill and [`API-Design-System.yaml`](./API-Design-System.yaml), then validates it.
-3. **Generates the server:** runs `openapi-generator-cli` with the `aspnetcore` generator.
+2. **Writes the contract first:** creates the OAS YAML file in `features/` (e.g. `features/GroundEventOAS.yaml`) using the [`api-oas`](./.github/skills/api-oas/SKILL.md) skill and [`API-Design-System.yaml`](./API-Design-System.yaml), then validates it.
+3. **Generates the server:** runs `./generate-webapi.sh features/<Feature>OAS.yaml` on that contract, so the code lands in `APIs/<Feature>.Api` with the custom templates and API versioning.
 4. **Implements:** writes the controllers, services, validation and `ProblemDetail` error handling.
 5. **Tests:** writes xUnit integration tests, then runs `dotnet build` and `dotnet test` and fixes failures.
 6. **Reports:** lists the endpoints, the decisions it made on its own, and any departures from the design standards.
@@ -116,7 +116,7 @@ The agent is the more convenient option: **you don't have to write the OAS YAML 
 2. Select **api-webapi-generator** in the agent picker.
 3. Send a prompt, for example:
    ```text
-   Implement #GroundEventReadme.md as a .NET Web API
+   Implement #features/GroundEventReadme.md as a .NET Web API
    ```
    or describe the feature directly:
    ```text
@@ -126,7 +126,7 @@ The agent is the more convenient option: **you don't have to write the OAS YAML 
 
 To run it without approval prompts, allow its terminal commands in VS Code settings, e.g. `"chat.tools.terminal.autoApprove": { "openapi-generator-cli": true, "dotnet": true, "java": true, "npx": true }`. Setting names vary between VS Code versions.
 
-> **Note:** the agent currently writes generated code to `src/<Package>`, not `APIs/`, and does not use `generate-webapi.sh` or its custom controller template.
+> **Note:** the agent is contract-first — it never generates code before the OAS file exists and validates, and it generates through `generate-webapi.sh` (same templates and `APIs/` layout as Option 1) rather than calling `openapi-generator-cli generate` itself.
 
 ## Which option to use
 
@@ -141,8 +141,8 @@ To run it without approval prompts, allow its terminal commands in VS Code setti
 | Path | Purpose |
 |------|---------|
 | [`API-Design-System.yaml`](./API-Design-System.yaml) | Organization API design standards |
-| [`GroundEventReadme.md`](./GroundEventReadme.md) | Sample feature requirements |
-| [`GroundEventOAS.yaml`](./GroundEventOAS.yaml) | Sample OAS contract created from those requirements |
+| [`features/GroundEventReadme.md`](./features/GroundEventReadme.md) | Sample feature requirements |
+| [`features/GroundEventOAS.yaml`](./features/GroundEventOAS.yaml) | Sample OAS contract created from those requirements |
 | [`generate-webapi.sh`](./generate-webapi.sh) | Generates code from an OAS file into `APIs/` |
 | [`templates/aspnetcore/`](./templates/aspnetcore/controller.mustache) | Custom generator templates: concrete controllers returning OAS sample DTOs as C# objects, with Asp.Versioning wiring |
 | [`.github/skills/api-oas/`](./.github/skills/api-oas/SKILL.md) | Copilot skill for writing and editing OAS files |

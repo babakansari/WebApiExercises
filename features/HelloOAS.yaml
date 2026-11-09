@@ -1,0 +1,100 @@
+openapi: 3.0.3
+info:
+  title: Hello API
+  version: 1.0.0
+  description: >-
+    Minimal greeting API that returns a "Hello" message. Errors follow an RFC 9457
+    ProblemDetail-based structure.
+servers:
+  - url: https://api.example.com/api/v1
+    description: For CI/CD environment
+  - url: http://localhost:3000/api/v1
+    description: For local development environment
+security:
+  - bearerAuth: []
+tags:
+  - name: Hello
+    description: Greeting endpoint.
+paths:
+  /hello:
+    get:
+      tags: [Hello]
+      operationId: getHello
+      summary: Get a greeting
+      description: Returns a "Hello" greeting message. Public endpoint; no authentication required.
+      security: []
+      responses:
+        '200':
+          description: Greeting message.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelloResponse'
+              example:
+                message: Hello
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: OAuth 2.0 / OIDC bearer access token (organization standard).
+  schemas:
+    HelloResponse:
+      type: object
+      description: Greeting message.
+      required: [message]
+      properties:
+        message:
+          type: string
+          description: The greeting text.
+          example: Hello
+    ProblemDetail:
+      type: object
+      description: RFC 9457 Problem Details object.
+      required: [status, title]
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: URI reference identifying the problem type.
+          example: about:blank
+        title:
+          type: string
+          description: Short, human-readable summary of the problem.
+          example: Internal server error
+        status:
+          type: integer
+          format: int32
+          description: HTTP status code; must match the response status.
+          example: 500
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+          example: An unexpected error occurred.
+        instance:
+          type: string
+          format: uri-reference
+          description: URI reference identifying this occurrence.
+          example: /api/v1/hello
+    HelloErrorResponse:
+      type: object
+      description: Error response with a general problem.
+      required: [detail]
+      properties:
+        detail:
+          $ref: '#/components/schemas/ProblemDetail'
+  responses:
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/HelloErrorResponse'
+          example:
+            detail:
+              status: 500
+              title: Internal server error
+              instance: /api/v1/hello

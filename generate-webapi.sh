@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Generate an ASP.NET Core Web API from an OAS file using openapi-generator-cli.
 # Usage: ./generate-webapi.sh <oas-file> [packageName] [outputDir]
-#   e.g. ./generate-webapi.sh GroundEventOAS.yaml
+#   e.g. ./generate-webapi.sh features/GroundEventOAS.yaml
 #        -> package GroundEvent.Api, project in APIs/GroundEvent.Api/src
 set -euo pipefail
 
@@ -21,7 +21,8 @@ if ! command -v openapi-generator-cli >/dev/null 2>&1; then
   exit 1
 fi
 
-# Derive a PascalCase name from the file: GroundEventOAS.yaml / ground-event.oas.yaml -> GroundEvent
+# Derive a PascalCase name from the file name, ignoring any directory:
+# features/GroundEventOAS.yaml / ground-event.oas.yaml -> GroundEvent
 BASE_NAME="$(basename "$OAS_FILE")"
 BASE_NAME="${BASE_NAME%.*}"
 BASE_NAME="$(printf '%s' "$BASE_NAME" | sed -E 's/[._-]?(oas|OAS|openapi|OpenApi|OpenAPI|swagger|Swagger)$//')"
