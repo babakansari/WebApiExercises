@@ -1,0 +1,133 @@
+# Organization API design quick reference
+# Standards basis: HTTP Semantics (RFC 9110), Problem Details (RFC 9457),
+# OpenAPI 3.x, and the Zalando RESTful API Guidelines.
+
+API:
+  Purpose: Consistent, secure, reliable APIs that are easy to use and evolve.
+  Principles:
+    - Design the contract before implementation.
+    - Default to secure, least-privilege access.
+    - Prefer backward-compatible changes.
+    - Document, version, and test every API.
+  Style: REST by default; use RPC or events when they better fit the interaction.
+
+URLs:
+  Scheme: HTTPS only.
+  Host: Organization-defined; use port 443 for public APIs.
+  Path:
+    Version: /v{major}
+    Rules:
+      - Use lowercase, plural resource names and kebab-case words.
+      - Use nouns, not verbs; identify one resource with a path parameter.
+      - Keep paths shallow; do not put secrets or personal data in URLs.
+    Examples:
+      Good: /v1/customer-orders/{orderId}
+      Avoid: /v1/getCustomerOrders
+  Query:
+    Purpose: Filter, search, sort, and paginate; never change server state.
+    Names: camelCase; common parameters include filter, sort, limit, cursor.
+    Rules:
+      - Document supported fields, operators, defaults, and maximum page size.
+      - Prefer cursor pagination for large or changing collections.
+
+Versioning:
+  Strategy: Major version in the URL, such as /v1.
+  Breaking change: Requires a new major version and a migration/deprecation plan.
+  Compatible change: Add optional request fields or response fields; clients ignore unknown fields.
+
+Methods:
+  GET:
+    Purpose: Read; no state change.
+    Safe: true
+    Idempotent: true
+    Success: [200, 204, 206]
+    ConditionalSuccess: 304
+  POST:
+    Purpose: Create a resource or submit an action.
+    Safe: false
+    Idempotent: false
+    Success: [200, 201, 202, 204]
+    Retry: Use Idempotency-Key when a client may retry a create/action.
+  PUT:
+    Purpose: Fully replace a resource at a known URL.
+    Safe: false
+    Idempotent: true
+    Success: [200, 201, 204]
+  PATCH:
+    Purpose: Partially update a resource.
+    Safe: false
+    Idempotent: Depends on the patch operation.
+    Success: [200, 204]
+    Concurrency: Use If-Match with ETag when lost updates are possible.
+  DELETE:
+    Purpose: Delete or deactivate a resource.
+    Safe: false
+    Idempotent: true
+    Success: [200, 202, 204]
+    Repeat: Define whether deleting an already-deleted resource returns 204 or 404.
+  CommonFailureStatuses:
+    "400": Malformed request.
+    "401": Missing or invalid authentication.
+    "403": Authenticated but not allowed.
+    "404": Resource not found or intentionally hidden.
+    "409": Conflict with current resource state.
+    "412": If-Match precondition failed.
+    "415": Unsupported request media type.
+    "422": Valid syntax, invalid value or business rule.
+    "429": Rate limited; include Retry-After when known.
+    "500": Unexpected server error.
+    "503": Temporarily unavailable; include Retry-After when known.
+
+Headers:
+  Request:
+    Authorization: "Bearer <OAuth2/OIDC access token>; omit only for explicitly public APIs."
+    Accept: "Response media types accepted, usually application/json."
+    Content-Type: Required when sending a body; usually application/json.
+    Idempotency-Key: Organization convention for retry protection on supported POST operations.
+    If-Match: Conditional update to prevent lost writes.
+    traceparent: W3C distributed tracing context.
+  Response:
+    Location: Created resource or asynchronous operation URL.
+    ETag: Representation version for caching or concurrency.
+    Retry-After: Suggested retry delay for 429 or 503.
+
+Request:
+  Body: JSON by default; UTF-8.
+  Rules:
+    - Validate types, required fields, limits, and business constraints.
+    - Reject invalid input clearly; do not silently truncate or coerce.
+    - Use camelCase JSON property names.
+    - Use ISO 8601 dates/times and UTC for timestamps.
+
+Response:
+  Success:
+    - Return the documented status and representation.
+    - Use 201 plus Location when creating a resource.
+    - Use 202 and an operation-status URL for asynchronous work.
+    - Use 204 when there is no response body.
+    - Do not return a body with 204 or 304.
+  Errors:
+    MediaType: application/problem+json
+    Format: RFC 9457 Problem Details.
+    Rules:
+      - The HTTP status and problem status must agree.
+      - Use a stable machine-readable code when clients need application-specific handling.
+      - Never expose stack traces, secrets, or internal infrastructure details.
+
+Security:
+  - Require HTTPS; use OAuth 2.0/OIDC bearer tokens unless an approved alternative applies.
+  - Validate token issuer, audience, signature, and expiry.
+  - Authorize every request, including resource ownership and tenant boundaries.
+  - Never put credentials in URLs or logs.
+
+Resiliency:
+  - Set bounded timeouts for requests and dependencies.
+  - Retry only transient failures, with backoff; honor Retry-After.
+  - Do not retry non-idempotent operations without Idempotency-Key.
+  - Return 429 for rate limits.
+  - Include a correlation/tracing identifier in logs; never log secrets.
+
+Governance:
+  Contract: OpenAPI 3.x for HTTP APIs.
+  CI: "npx @stoplight/spectral-cli lint --ruleset API-Design-System.spectral.yaml <api-spec.yaml>"
+  Note: Linting checks contracts; integration tests must verify runtime behavior.

@@ -1,0 +1,89 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Ll]og/
+[Ll]ogs/
+out/
+artifacts/
+publish/
+*.Publish.xml
+*.pubxml.user
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+*.DotSettings.user
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+
+# Test results and coverage
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+coverage*.info
+TestResults/
+
+# ASP.NET Core
+appsettings.*.local.json
+*.db
+*.db-shm
+*.db-wal
+wwwroot/lib/
+node_modules/
+
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+secrets.json
+
+# Logs and temporary files
+*.log
+*.tmp
+*.tmp_proj
+*.cache
+*.pdb
+*.swp
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# OpenAPI Generator metadata (remove this if you want to commit it)
+.openapi-generator/
