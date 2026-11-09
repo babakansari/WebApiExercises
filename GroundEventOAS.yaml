@@ -23,7 +23,7 @@ paths:
     get:
       tags: [GroundEventTypes]
       operationId: getGroundEventTypes
-      summary: Get all Ground Event Types
+      summary: Get Ground Event Types
       description: Fetch all Ground Event Types.
       responses:
         '200':
@@ -39,6 +39,8 @@ paths:
                   name: Maintenance
                 - id: 2
                   name: Cleaning
+                - id: 3
+                  name: Fueling
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -50,7 +52,7 @@ paths:
       tags: [GroundEvents]
       operationId: getGroundEvents
       summary: Get Ground Events
-      description: Fetch Ground Events.
+      description: Fetch all Ground Events.
       responses:
         '200':
           description: List of Ground Events.
@@ -60,6 +62,27 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GroundEvent'
+              example:
+                - id: 123
+                  type:
+                    id: 1
+                    name: Maintenance
+                  airline: AC
+                  aircraft: C-FABC
+                  station: YYZ
+                  priority: High
+                  startUTC: '2026-11-08T10:00:00Z'
+                  endUTC: '2026-11-08T12:00:00Z'
+                - id: 124
+                  type:
+                    id: 2
+                    name: Cleaning
+                  airline: AC
+                  aircraft: C-FXYZ
+                  station: YUL
+                  priority: Normal
+                  startUTC: '2026-11-08T13:00:00Z'
+                  endUTC: '2026-11-08T14:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -77,6 +100,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GroundEventRequest'
+            example:
+              type:
+                id: 1
+              airline: AC
+              aircraft: C-FABC
+              station: YYZ
+              priority: High
+              startUTC: '2026-11-08T10:00:00Z'
+              endUTC: '2026-11-08T12:00:00Z'
       responses:
         '201':
           description: Ground Event created.
@@ -91,6 +123,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GroundEventResponse'
+              example:
+                recordId: 123
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -111,6 +145,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GroundEventRequest'
+            example:
+              type:
+                id: 1
+              airline: AC
+              aircraft: C-FABC
+              station: YYZ
+              priority: High
+              startUTC: '2026-11-08T10:00:00Z'
+              endUTC: '2026-11-08T12:00:00Z'
       responses:
         '200':
           description: Ground Event updated.
@@ -118,6 +161,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GroundEventResponse'
+              example:
+                recordId: 123
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':

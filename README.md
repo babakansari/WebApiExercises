@@ -40,32 +40,65 @@ openapi-generator-cli generate \
   -i GroundEventOAS.yaml \
   -g aspnetcore \
   -o APIs/GroundEvent.Api \
-  --additional-properties=packageName=GroundEvent.Api,aspnetCoreVersion=10.0,buildTarget=program,operationIsAsync=true,operationResultTask=true,classModifier=abstract,operationModifier=abstract,nullableReferenceTypes=true,useSwashbuckle=true
+  -t templates/aspnetcore \
+  --model-name-mappings GroundEvent=GroundEventModel \
+  --additional-properties=packageName=GroundEvent.Api,aspnetCoreVersion=10.0,buildTarget=program,operationResultTask=true,operationModifier=virtual,generateBody=true,nullableReferenceTypes=true,useSwashbuckle=true,apiVersionNumber=1.0,apiVersionGroup=v1,apiVersionMajor=1,apiVersionMinor=0,apiRoutePrefix=/api
 ```
 
 | Option | Effect |
 |--------|--------|
 | `aspnetCoreVersion=10.0` | Targets ASP.NET Core 10 (match your installed SDK) |
 | `buildTarget=program` | Creates a runnable app (`library` creates a class library instead) |
-| `classModifier=abstract`, `operationModifier=abstract` | Makes the generated controllers abstract, so your logic goes in subclasses and survives regeneration |
+| `operationModifier=virtual`, `generateBody=true` | Creates concrete controllers with method bodies. Abstract controllers are not registered by ASP.NET Core, so Swagger would show *"No operations defined in spec!"* |
+| `-t templates/aspnetcore` | Uses the custom [`controller.mustache`](./templates/aspnetcore/controller.mustache) and [`model.mustache`](./templates/aspnetcore/model.mustache) (see below) |
+| `--model-name-mappings` | Added automatically by the script when a model name clashes with a package namespace segment (e.g. `GroundEvent` in `GroundEvent.Api`) |
 | `operationResultTask=true` | Makes controller methods return `Task<IActionResult>` |
 | `useSwashbuckle=true` | Adds Swagger UI |
+| `apiVersion*`, `apiRoutePrefix` | Derived by the script from the OAS `servers` path (see API versioning below) |
+
+The custom controller template makes every operation:
+- return the **sample DTO from the OAS** with the operation's success status code, e.g. `201` for create;
+- throw `NotImplementedException` when the success response has no body (e.g. `204` delete).
+
+The sample is a plain C# object, not a JSON string parsed at runtime: the custom model template gives
+every generated model a `Sample` property built from the OAS `example` values, and controllers return
+`GroundEventType.Sample`, `new List<GroundEventType> { GroundEventType.Sample }`, and so on. Nested
+models reuse each other's `Sample`, so the whole sample graph is compile-time checked.
+
+It intentionally does **not** emit `[Authorize]` for the spec's security schemes, because the generated `Startup` does not configure authentication and every request would fail. Add authentication when you implement the API.
+
+#### API versioning
+
+The script reads the version segment of the OAS `servers` path (`https://.../api/v1` → prefix `/api`,
+version `1.0`) and the templates turn it into real ASP.NET Core API versioning rather than a hard-coded
+path, following the [Asp.Versioning](https://github.com/dotnet/aspnet-api-versioning) conventions:
+
+```csharp
+[ApiController]
+[ApiVersion("1.0")]
+public class GroundEventTypesApiController : ControllerBase
+{
+    [HttpGet]
+    [Route("/api/v{version:apiVersion}/groundeventtypes")]
+    [MapToApiVersion("1.0")]
+    ...
+```
+
+`Startup` registers `AddApiVersioning(...).AddMvc().AddApiExplorer(...)` with
+`UrlSegmentApiVersionReader`, `ReportApiVersions` (responses carry an `api-supported-versions` header)
+and `SubstituteApiVersionInUrl`, so the OpenAPI document published at `/openapi/v1/openapi.json`
+shows the concrete `/api/v1/...` paths. To add a version later, annotate the controller or action with
+the extra `[ApiVersion]`/`[MapToApiVersion]` values and add a matching `SwaggerDoc` entry.
 
 ### 3. Build and run
 ```bash
 dotnet build APIs/GroundEvent.Api/src/GroundEvent.Api/GroundEvent.Api.csproj
 dotnet run   --project APIs/GroundEvent.Api/src/GroundEvent.Api/GroundEvent.Api.csproj
 ```
-Swagger UI is then available at the URL printed in the console.
+Swagger UI is then available at `/openapi` on the URL printed in the console.
 
 ### 4. Implement the API
-The generator creates the contract only: abstract controllers and DTO models. To implement it:
-- Write concrete controllers that inherit the generated ones, and add your services.
-- List your hand-written files in `APIs/<PackageName>/.openapi-generator-ignore` so that regenerating after a spec change doesn't overwrite them.
-
-> **Known issues with the current options:** the generated code may not compile until you fix these:
-> - A package name that starts with a model name (e.g. `GroundEvent.Api` with a `GroundEvent` model) causes `'GroundEvent' is a namespace but is used like a type`. Use a different package name, e.g. `GroundEventService.Api`.
-> - `operationIsAsync=true` together with `operationModifier=abstract` causes `CS1994`. Remove `operationIsAsync=true`; methods still return `Task<IActionResult>`.
+Replace the sample bodies in the generated controllers (`Controllers/*Api.cs`) with real logic, or subclass the controllers and override the `virtual` methods. Add hand-written or edited files to `APIs/<PackageName>/.openapi-generator-ignore` so that regenerating after a spec change doesn't overwrite them.
 
 ## Option 2: Generate the whole API from a prompt with the `api-webapi-generator` agent
 
@@ -93,7 +126,7 @@ The agent is the more convenient option: **you don't have to write the OAS YAML 
 
 To run it without approval prompts, allow its terminal commands in VS Code settings, e.g. `"chat.tools.terminal.autoApprove": { "openapi-generator-cli": true, "dotnet": true, "java": true, "npx": true }`. Setting names vary between VS Code versions.
 
-> **Note:** the agent currently writes generated code to `src/<Package>`, not `APIs/`, and uses the same generator options listed under Known issues above.
+> **Note:** the agent currently writes generated code to `src/<Package>`, not `APIs/`, and does not use `generate-webapi.sh` or its custom controller template.
 
 ## Which option to use
 
@@ -111,6 +144,7 @@ To run it without approval prompts, allow its terminal commands in VS Code setti
 | [`GroundEventReadme.md`](./GroundEventReadme.md) | Sample feature requirements |
 | [`GroundEventOAS.yaml`](./GroundEventOAS.yaml) | Sample OAS contract created from those requirements |
 | [`generate-webapi.sh`](./generate-webapi.sh) | Generates code from an OAS file into `APIs/` |
+| [`templates/aspnetcore/`](./templates/aspnetcore/controller.mustache) | Custom generator templates: concrete controllers returning OAS sample DTOs as C# objects, with Asp.Versioning wiring |
 | [`.github/skills/api-oas/`](./.github/skills/api-oas/SKILL.md) | Copilot skill for writing and editing OAS files |
 | [`.github/agents/api-webapi-generator.agent.md`](./.github/agents/api-webapi-generator.agent.md) | Copilot agent that builds an API end to end from a prompt |
 | `APIs/` | Generated Web API projects |

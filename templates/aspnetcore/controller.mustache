@@ -1,0 +1,91 @@
+{{>partial_header}}
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+{{#operationResultTask}}
+using System.Threading;
+using System.Threading.Tasks;
+{{/operationResultTask}}
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Asp.Versioning;
+{{#useSwashbuckle}}
+using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.SwaggerGen;
+{{/useSwashbuckle}}
+using {{packageName}}.Attributes;
+using {{modelPackage}};
+
+namespace {{apiPackage}}
+{ {{#operations}}
+    /// <summary>
+    /// {{description}}
+    /// </summary>{{#description}}
+    [Description("{{.}}")]{{/description}}
+    [ApiController]
+{{! The API version comes from the version segment of the OAS servers URL. It is declared once per
+    controller and carried in the route as the {version:apiVersion} constraint, so Asp.Versioning
+    owns the version instead of it being hard-coded into every path. }}
+    [ApiVersion("{{apiVersionNumber}}")]
+    public {{#classModifier}}{{.}} {{/classModifier}}class {{classname}}Controller : ControllerBase
+    { {{#operation}}
+        /// <summary>
+        /// {{summary}}
+        /// </summary>{{#notes}}
+        /// <remarks>{{.}}</remarks>{{/notes}}{{#allParams}}
+        /// <param name="{{paramName}}">{{description}}{{#isDeprecated}} (deprecated){{/isDeprecated}}</param>{{/allParams}}{{#operationResultTask}}{{#operationIsAsync}}
+        /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>{{/operationIsAsync}}{{/operationResultTask}}{{#responses}}
+        /// <response code="{{code}}">{{message}}</response>{{/responses}}
+        [{{httpMethod}}]
+        [Route("{{{apiRoutePrefix}}}/v{version:apiVersion}{{{path}}}")]
+        [MapToApiVersion("{{apiVersionNumber}}")]
+{{! Security requirements are intentionally not emitted as [Authorize]: the generated Startup does not
+    configure authentication, so [Authorize] makes every request fail. Add authentication as a TODO. }}
+        {{#vendorExtensions.x-aspnetcore-consumes}}
+        [Consumes({{&vendorExtensions.x-aspnetcore-consumes}})]
+        {{/vendorExtensions.x-aspnetcore-consumes}}
+        [ValidateModelState]{{#useSwashbuckle}}
+        [SwaggerOperation("{{operationId}}")]{{#responses}}{{#dataType}}
+        [SwaggerResponse(statusCode: {{code}}, type: typeof({{&dataType}}), description: "{{message}}")]{{/dataType}}{{/responses}}{{/useSwashbuckle}}{{^useSwashbuckle}}{{#responses}}{{#dataType}}
+        [ProducesResponseType(statusCode: {{code}}, type: typeof({{&dataType}}))]{{/dataType}}{{/responses}}{{/useSwashbuckle}}
+        {{#isDeprecated}}
+        [Obsolete]
+        {{/isDeprecated}}
+        public {{operationModifier}} {{#operationResultTask}}{{#operationIsAsync}}async {{/operationIsAsync}}Task<{{#returnType}}ActionResult<{{{returnType}}}>{{/returnType}}{{^returnType}}IActionResult{{/returnType}}>{{/operationResultTask}}{{^operationResultTask}}IActionResult{{/operationResultTask}} {{operationId}}({{#allParams}}{{>pathParam}}{{>queryParam}}{{>bodyParam}}{{>formParam}}{{>headerParam}}{{^-last}}{{^isCookieParam}}, {{/isCookieParam}}{{/-last}}{{#-last}}{{#operationResultTask}}{{#operationIsAsync}}, {{/operationIsAsync}}{{/operationResultTask}}{{/-last}}{{/allParams}}{{#operationResultTask}}{{#operationIsAsync}}CancellationToken cancellationToken{{/operationIsAsync}}{{/operationResultTask}}){{^generateBody}};{{/generateBody}}
+        {{#generateBody}}
+        {
+            {{#cookieParams}}
+            var {{paramName}} = Request.Cookies["{{paramName}}"];
+            {{/cookieParams}}
+
+            //TODO: Replace this generated sample with the real implementation.
+{{#returnType}}
+{{#responses}}
+{{#-first}}
+{{#is2xx}}
+{{#dataType}}
+            // Sample response built as a real C# object from the OAS examples; the models expose
+            // those examples through their generated Sample property.
+            {{{returnType}}} sample = {{#returnProperty}}{{>sampleValue}}{{/returnProperty}}{{^returnProperty}}default{{/returnProperty}};
+            return {{#operationResultTask}}{{^operationIsAsync}}Task.FromResult<ActionResult<{{{returnType}}}>>({{/operationIsAsync}}{{/operationResultTask}}StatusCode({{code}}, sample){{#operationResultTask}}{{^operationIsAsync}}){{/operationIsAsync}}{{/operationResultTask}};
+{{/dataType}}
+{{^dataType}}
+            throw new NotImplementedException();
+{{/dataType}}
+{{/is2xx}}
+{{^is2xx}}
+            throw new NotImplementedException();
+{{/is2xx}}
+{{/-first}}
+{{/responses}}
+{{/returnType}}
+{{^returnType}}
+            throw new NotImplementedException();
+{{/returnType}}
+        }
+        {{/generateBody}}
+        {{/operation}}
+    }
+{{/operations}}
+}

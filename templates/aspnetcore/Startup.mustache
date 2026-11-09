@@ -1,0 +1,206 @@
+{{>partial_header}}
+{{!
+    Fork of the openapi-generator 7.27.0 aspnetcore Startup.mustache.
+    Local change: API versioning is registered through Asp.Versioning (AddApiVersioning + AddMvc +
+    AddApiExplorer) instead of baking the version into the controller routes, and the Swashbuckle
+    document is named after the ApiExplorer version group so the versioned routes are documented.
+    The stock BasePathFilter registration is therefore dropped: the ApiExplorer already substitutes
+    {version:apiVersion} in the documented paths. Re-apply when refreshing from a newer release.
+}}using System;
+using System.IO;
+using System.Reflection;
+using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+{{#useSwashbuckle}}
+using Microsoft.OpenApi.Models;
+{{/useSwashbuckle}}
+{{#useNewtonsoft}}
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+{{/useNewtonsoft}}
+{{^useNewtonsoft}}
+using System.Text.Json;
+using System.Text.Json.Serialization;
+{{/useNewtonsoft}}
+using {{packageName}}.Authentication;
+{{#useSwashbuckle}}
+using {{packageName}}.Filters;
+{{/useSwashbuckle}}
+using {{packageName}}.OpenApi;
+using {{packageName}}.Formatters;
+
+namespace {{packageName}}
+{
+    /// <summary>
+    /// Startup
+    /// </summary>
+    public class Startup
+    {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="configuration"></param>
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        /// <summary>
+        /// The application configuration.
+        /// </summary>
+        public IConfiguration Configuration { get; }
+
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// </summary>
+        /// <param name="services"></param>
+        public void ConfigureServices(IServiceCollection services)
+        {
+{{#authMethods}}
+{{#isApiKey}}
+            services.AddTransient<IAuthorizationHandler, ApiKeyRequirementHandler>();
+            services.AddAuthorization(authConfig =>
+            {
+                authConfig.AddPolicy("{{name}}", policyBuilder =>
+                {
+                    policyBuilder
+                        .AddRequirements(new ApiKeyRequirement(new[] { "my-secret-key" },"{{name}}"));
+                });
+            });
+{{/isApiKey}}
+{{/authMethods}}
+
+            // API versioning. The default version matches the version segment of the OAS servers URL
+            // and is requested through the URL segment ({version:apiVersion} in the controller routes).
+            // ReportApiVersions advertises the supported versions in the api-supported-versions header.
+            services
+                .AddApiVersioning(options =>
+                {
+                    options.DefaultApiVersion = new ApiVersion({{apiVersionMajor}}, {{apiVersionMinor}});
+                    options.AssumeDefaultVersionWhenUnspecified = true;
+                    options.ReportApiVersions = true;
+                    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+                })
+                .AddMvc()
+                .AddApiExplorer(options =>
+                {
+                    // Produces the group name used as the OpenAPI document name, e.g. "v1",
+                    // and rewrites {version:apiVersion} to the concrete version in documented paths.
+                    options.GroupNameFormat = "'v'VVV";
+                    options.SubstituteApiVersionInUrl = true;
+                });
+
+            // Add framework services.
+            services
+                // Don't need the full MVC stack for an API, see https://andrewlock.net/comparing-startup-between-the-asp-net-core-3-templates/
+                .AddControllers(options => {
+                    options.InputFormatters.Insert(0, new InputFormatterStream());
+                })
+                {{#compatibilityVersion}}
+                // Don't need this for 3.x - see https://docs.microsoft.com/en-us/aspnet/core/mvc/compatibility-version?view=aspnetcore-3.1
+                //.SetCompatibilityVersion(CompatibilityVersion.{{.}})
+                {{/compatibilityVersion}}
+                {{#useNewtonsoft}}
+                .AddNewtonsoftJson(opts =>
+                {
+                    opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    opts.SerializerSettings.Converters.Add(new StringEnumConverter
+                    {
+                        NamingStrategy = new CamelCaseNamingStrategy()
+                    });
+                });
+                {{/useNewtonsoft}}
+                {{^useNewtonsoft}}
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+                });
+                {{/useNewtonsoft}}
+{{#useSwashbuckle}}
+            services
+                .AddSwaggerGen(c =>
+                {
+                    c.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true);
+                    
+                    c.SwaggerDoc("{{apiVersionGroup}}", new OpenApiInfo
+                    {
+                        Title = "{{{appName}}}{{^appName}}{{packageName}}{{/appName}}",
+                        Description = "{{{appName}}}{{^appName}}{{packageName}}{{/appName}} (ASP.NET Core {{aspnetCoreVersion}})",
+                        TermsOfService = new Uri("{{{termsOfService}}}{{^termsOfService}}https://github.com/openapitools/openapi-generator{{/termsOfService}}"),
+                        Contact = new OpenApiContact
+                        {
+                            Name = "{{{infoName}}}{{^infoName}}OpenAPI-Generator Contributors{{/infoName}}",
+                            Url = new Uri("{{{infoUrl}}}{{^infoUrl}}https://github.com/openapitools/openapi-generator{{/infoUrl}}"),
+                            Email = "{{{infoEmail}}}"
+                        },
+                        License = new OpenApiLicense
+                        {
+                            Name = "{{licenseName}}",
+                            Url = new Uri("{{licenseUrl}}")
+                        },
+                        Version = "{{apiVersionNumber}}",
+                    });
+                    c.CustomSchemaIds(type => type.FriendlyId(true));
+                    c.IncludeXmlComments($"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+                    // No BasePathFilter: the versioned route already carries the full path and the
+                    // Asp.Versioning ApiExplorer substitutes {version:apiVersion} for the concrete version.
+
+                    // Include DataAnnotation attributes on Controller Action parameters as OpenAPI validation rules (e.g required, pattern, ..)
+                    // Use [ValidateModelState] on Actions to actually validate it in C# as well!
+                    c.OperationFilter<GeneratePathParamsValidationFilter>();
+                });
+{{#useNewtonsoft}}
+                services
+                    .AddSwaggerGenNewtonsoftSupport();
+{{/useNewtonsoft}}
+{{/useSwashbuckle}}
+        }
+
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+{{#useSwashbuckle}}
+            app.UseSwagger(c =>
+                {
+                    c.RouteTemplate = "openapi/{documentName}/openapi.json";
+                })
+                .UseSwaggerUI(c =>
+                {
+                    // set route prefix to openapi, e.g. http://localhost:8080/openapi/index.html
+                    c.RoutePrefix = "openapi";
+                    //TODO: Either use the SwaggerGen generated OpenAPI contract (generated from C# classes)
+                    c.SwaggerEndpoint("/openapi/{{apiVersionGroup}}/openapi.json", "{{{appName}}}{{^appName}}{{packageName}}{{/appName}} {{apiVersionGroup}}");
+
+                    //TODO: Or alternatively use the original OpenAPI contract that's included in the static files
+                    // c.SwaggerEndpoint("/openapi-original.json", "{{{appName}}}{{^appName}}{{packageName}}{{/appName}} Original");
+                }){{/useSwashbuckle}};
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
+        }
+    }
+}
