@@ -1,0 +1,38 @@
+openapi: 3.0.3
+info:
+  title: Help API
+  version: 1.0.0
+  description: OpenAPI contract for the Help API.
+servers:
+  - url: https://api.example.com/api/v1
+    description: For CI/CD environment
+  - url: http://localhost:3000/api/v1
+    description: For local development environment
+security:
+  - bearerAuth: []
+tags:
+  - name: Help
+    description: Help API operations.
+paths:
+  /hello/v1:
+    get:
+      tags: [Help]
+      operationId: getHello
+      summary: Get help
+      responses:
+        '200':
+          description: Help information retrieved successfully.
+    post:
+      tags: [Help]
+      operationId: postHello
+      summary: Submit a help request
+      responses:
+        '200':
+          description: Help request processed successfully.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: OAuth 2.0 / OIDC bearer access token (organization standard).

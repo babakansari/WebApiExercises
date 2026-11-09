@@ -15,7 +15,9 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.SwaggerGen;
 {{/useSwashbuckle}}
 using {{packageName}}.Attributes;
+{{#hasModels}}
 using {{modelPackage}};
+{{/hasModels}}
 
 namespace {{apiPackage}}
 { {{#operations}}

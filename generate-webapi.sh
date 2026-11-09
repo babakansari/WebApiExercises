@@ -77,6 +77,9 @@ ADDITIONAL_PROPS="$ADDITIONAL_PROPS,apiVersionNumber=$API_VERSION,apiVersionGrou
 MODEL_FILES="$(openapi-generator-cli generate --dry-run -i "$OAS_FILE" -g aspnetcore -o "$OUTPUT_DIR" \
   --additional-properties="$ADDITIONAL_PROPS" 2>&1 \
   | sed -nE "s#.*/src/${PACKAGE_NAME//./\\.}/Models/([A-Za-z0-9_]+)\.cs\$#\1#p" | sort -u)"
+if [[ -n "$MODEL_FILES" ]]; then
+  ADDITIONAL_PROPS="$ADDITIONAL_PROPS,hasModels=true"
+fi
 
 MAPPING_ARGS=()
 IFS='.' read -r -a NAMESPACE_SEGMENTS <<< "$PACKAGE_NAME"
