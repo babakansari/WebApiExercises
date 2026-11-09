@@ -17,6 +17,7 @@ This repo has two ways to build an ASP.NET Core Web API:
 
 ### 1. Write or update the OAS file
 Create an OAS 3.0.3 YAML file for the feature in [`features/`](./features), e.g. [`features/GroundEventOAS.yaml`](./features/GroundEventOAS.yaml).
+To start from an example, copy [`features/TemplateOAS.yaml`](./features/TemplateOAS.yaml) and replace its sample operations, schemas, and configuration for your API.
 In Copilot Chat, the [`/api-oas`](./.github/skills/api-oas/SKILL.md) skill can write it from a requirements document such as [`features/GroundEventReadme.md`](./features/GroundEventReadme.md). The skill follows [`API-Design-System.yaml`](./API-Design-System.yaml).
 
 ### 2. Run the script
