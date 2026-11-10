@@ -1,0 +1,186 @@
+openapi: 3.0.3
+info:
+  title: Booking API
+  version: 1.0.0
+  description: API for booking a user to an event.
+servers:
+  - url: https://api.example.com/api/v1
+  - url: http://localhost:3000/api/v1
+tags:
+  - name: User
+    description: Operations related to users.
+  - name: Booking
+    description: Operations related to booking.
+  - name: Event
+    description: Operations related to events.
+
+paths:
+  /users/{id}:
+    get:
+      tags:
+        - User
+      operationId: getUserById
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userDetails'
+  /users/list:
+    get:
+      tags:
+        - User
+      operationId: getUsers
+      summary: Get list of users
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/user'
+  /events:
+    get:
+      tags:
+        - Event
+      operationId: getEvents
+      summary: Get list of events
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/event'
+    post:
+      tags:
+        - Event
+      operationId: createEvent
+      summary: Create a new event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/event'
+      responses:
+        '201':
+          description: Event created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/event'
+  /bookings:
+    post:
+      tags:
+        - Booking
+      operationId: createBooking
+      summary: Create a new booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createBooking'
+      responses:
+        '201':
+          description: Booking created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/booking'
+    
+components:
+  schemas:
+    userDetails:
+      type: object
+      properties:
+        userName:
+          type: string
+          example: "123"
+        Event:
+          type: array
+          items:
+            $ref: '#/components/schemas/event'
+          example:
+            - id: "456"
+              title: "Sample Event"
+              date: "2024-06-01T10:00:00Z"
+      required:
+        - userName
+        - Event
+    createBooking:
+      type: object
+      properties:
+        userName:
+          type: string
+          example: "123"
+        eventTitle:
+          type: string
+          example: "456"
+      required:
+        - userName
+        - eventTitle
+    user:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "123"
+        name:
+          type: string
+          example: "John Doe"
+      required:
+        - id
+        - name
+    event:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "456"
+        title:
+          type: string
+          example: "Sample Event"
+        date:
+          type: string
+          format: date-time
+          example: "2024-06-01T10:00:00Z"
+      required:
+        - id
+        - title
+        - date
+    booking:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "789"
+        userId:
+          type: string
+          example: "123"
+        eventId:
+          type: string
+          example: "456"
+      required:
+       - id
+       - userId
+       - eventId
