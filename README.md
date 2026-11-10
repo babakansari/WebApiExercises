@@ -26,7 +26,7 @@ In Copilot Chat, the [`/api-oas`](./.github/skills/api-oas/SKILL.md) skill can w
 ```
 The script:
 - validates the spec;
-- works out the package name from the file name, ignoring the folder (`features/GroundEventOAS.yaml` → `GroundEvent.Api`);
+- works out the package name from `info.x-package-name` in the OAS file if present, otherwise from the file name, ignoring the folder (`features/GroundEventOAS.yaml` → `GroundEvent.Api`);
 - generates the project into `APIs/<PackageName>`.
 
 You can override the package name and output folder:

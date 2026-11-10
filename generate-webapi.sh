@@ -28,7 +28,9 @@ BASE_NAME="${BASE_NAME%.*}"
 BASE_NAME="$(printf '%s' "$BASE_NAME" | sed -E 's/[._-]?(oas|OAS|openapi|OpenApi|OpenAPI|swagger|Swagger)$//')"
 FEATURE="$(printf '%s' "$BASE_NAME" | awk -F'[-_. ]+' '{ for (i = 1; i <= NF; i++) printf "%s%s", toupper(substr($i,1,1)), substr($i,2) }')"
 
-PACKAGE_NAME="${2:-${FEATURE}.Api}"
+# Package/namespace precedence: CLI argument > info.x-package-name in the OAS file > <Feature>.Api
+OAS_PACKAGE_NAME="$(sed -nE 's/^[[:space:]]+x-package-name:[[:space:]]*["'"'"']?([A-Za-z0-9_.]+)["'"'"']?[[:space:]]*$/\1/p' "$OAS_FILE" | head -1)"
+PACKAGE_NAME="${2:-${OAS_PACKAGE_NAME:-${FEATURE}.Api}}"
 OUTPUT_DIR="${3:-APIs/${PACKAGE_NAME}}"
 
 echo "OAS file : $OAS_FILE"
