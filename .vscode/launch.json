@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug generated API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-generated-apis",
+      "program": "${workspaceFolder}/APIs/${input:apiName}.Api/src/bin/Debug/net10.0/${input:apiName}.Api.dll",
+      "cwd": "${workspaceFolder}/APIs/${input:apiName}.Api/src",
+      "launchSettingsFilePath": "${workspaceFolder}/APIs/${input:apiName}.Api/src/Properties/launchSettings.json",
+      "launchSettingsProfile": "OpenAPI",
+      "stopAtEntry": false,
+      "justMyCode": true,
+      "console": "internalConsole",
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/openapi"
+      }
+    },
+    {
+      "name": "Attach to running API (./run.sh)",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}",
+      "justMyCode": true
+    }
+  ],
+  "inputs": [
+    {
+      "id": "apiName",
+      "type": "promptString",
+      "description": "Generated API name (folder APIs/<Name>.Api), e.g. Basic, Hello, GroundEvent",
+      "default": "Basic"
+    }
+  ]
+}
