@@ -41,6 +41,19 @@ Windows:
 ```
 build.bat
 ```
+
+## Data store
+
+The API uses the JSON-seeded in-memory store by default. To use the optional EF Core InMemory
+provider, set `DataStore:Provider` to `EfCoreInMemory` in `src/appsettings.json`, or set the
+environment variable `DataStore__Provider=EfCoreInMemory`.
+The active data source is shown in the Swagger API description.
+
+The EF Core store uses the same sample data and API operations as the default store. EF Core's
+InMemory provider keeps data only for the lifetime of the process; it is intended for local
+development and testing, not durable production storage. Set the provider back to `InMemory`
+to restore the default.
+
 ## Run in Docker
 
 ```

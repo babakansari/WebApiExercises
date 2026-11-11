@@ -18,11 +18,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using BookingSystem.Api.Data;
+using BookingSystem.Api.Data.EntityFramework;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using BookingSystem.Api.Authentication;
-using BookingSystem.Api.Data;
 using BookingSystem.Api.Filters;
 using BookingSystem.Api.OpenApi;
 using BookingSystem.Api.Formatters;
@@ -55,6 +56,7 @@ namespace BookingSystem.Api
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            var dataStoreProvider = Configuration["DataStore:Provider"] ?? "InMemory";
 
             // API versioning. The default version matches the version segment of the OAS servers URL
             // and is requested through the URL segment ({version:apiVersion} in the controller routes).
@@ -98,7 +100,7 @@ namespace BookingSystem.Api
                     c.SwaggerDoc("v1", new OpenApiInfo
                     {
                         Title = "Booking API",
-                        Description = "Booking API (ASP.NET Core 10.0)",
+                        Description = $"Data source: ({dataStoreProvider}).",
                         TermsOfService = new Uri("https://github.com/openapitools/openapi-generator"),
                         Contact = new OpenApiContact
                         {
@@ -124,7 +126,7 @@ namespace BookingSystem.Api
                 });
                 services
                     .AddSwaggerGenNewtonsoftSupport();
-                services.AddSingleton<IDataStore, InMemoryDataStore>();
+                services.AddBookingSystemDataSource(Configuration);
                 services.AddScoped<IBookingService, BookingService>();
         }
 
@@ -135,6 +137,14 @@ namespace BookingSystem.Api
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            if (string.Equals(Configuration["DataStore:Provider"], "EfCoreInMemory", StringComparison.OrdinalIgnoreCase))
+            {
+                using (var scope = app.ApplicationServices.CreateScope())
+                {
+                    BookingDatabaseInitializer.Initialize(scope.ServiceProvider.GetRequiredService<BookingDbContext>());
+                }
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

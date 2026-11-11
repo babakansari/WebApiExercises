@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using BookingSystem.Api.Data.Entities;
-using Newtonsoft.Json.Linq;
 
 namespace BookingSystem.Api.Data
 {
@@ -27,12 +25,10 @@ namespace BookingSystem.Api.Data
         /// </summary>
         public InMemoryDataStore()
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "Data", "BookingSystem.json");
-            var data = JObject.Parse(File.ReadAllText(path));
-
-            _users.AddRange(data["users"]?.ToObject<List<User>>() ?? new List<User>());
-            _events.AddRange(data["events"]?.ToObject<List<Event>>() ?? new List<Event>());
-            _bookings.AddRange(data["bookings"]?.ToObject<List<Booking>>() ?? new List<Booking>());
+            var seedData = BookingSystemSeedData.Load();
+            _users.AddRange(seedData.Users);
+            _events.AddRange(seedData.Events);
+            _bookings.AddRange(seedData.Bookings);
 
             _nextUserId = _users.Select(u => u.Id).DefaultIfEmpty(0).Max() + 1;
             _nextEventId = _events.Select(e => e.Id).DefaultIfEmpty(0).Max() + 1;
