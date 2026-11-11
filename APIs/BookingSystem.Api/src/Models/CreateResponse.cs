@@ -34,18 +34,6 @@ namespace BookingSystem.Api.Models
         public int? Id { get; set; }
 
         /// <summary>
-        /// A sample instance built from the example values in the OAS document.
-        /// Generated controller stubs return this instead of deserializing a JSON string,
-        /// so the sample is a real, compile-time checked C# object.
-        /// Note: a model that (indirectly) references itself would recurse here; break the
-        /// cycle by hand if that ever happens.
-        /// </summary>
-        public static CreateResponse Sample => new CreateResponse
-        {
-            Id = 789,
-        };
-
-        /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>

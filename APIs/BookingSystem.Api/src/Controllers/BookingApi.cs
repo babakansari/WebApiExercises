@@ -21,6 +21,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using BookingSystem.Api.Attributes;
 using BookingSystem.Api.Models;
+using BookingSystem.Api.Services;
 
 namespace BookingSystem.Api.Controllers
 { 
@@ -29,8 +30,9 @@ namespace BookingSystem.Api.Controllers
     /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
-    public class BookingApiController : ControllerBase
+    public class BookingApiController(IBookingService bookingService) : ControllerBase
     { 
+        IBookingService _bookingService = bookingService;
         /// <summary>
         /// Create a new booking
         /// </summary>
@@ -45,11 +47,11 @@ namespace BookingSystem.Api.Controllers
         [SwaggerResponse(statusCode: 201, type: typeof(CreateResponse), description: "Booking created successfully.")]
         public virtual Task<ActionResult<CreateResponse>> CreateBooking([FromBody]BookingPayload bookingPayload)
         {
-
-            //TODO: Replace this generated sample with the real implementation.
-            // Sample response built as a real C# object from the OAS examples; the models expose
-            // those examples through their generated Sample property.
-            CreateResponse sample = global::BookingSystem.Api.Models.CreateResponse.Sample;
+            var bookingId = _bookingService.CreateBooking(bookingPayload);
+            CreateResponse sample = new CreateResponse
+            {
+                Id = bookingId
+            };
             return Task.FromResult<ActionResult<CreateResponse>>(StatusCode(201, sample));
         }
     }

@@ -29,8 +29,9 @@ namespace BookingSystem.Api.Models
         /// <summary>
         /// Gets or Sets Id
         /// </summary>
+        [Required]
         [DataMember(Name="id", EmitDefaultValue=true)]
-        public int? Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Gets or Sets Name
@@ -47,20 +48,6 @@ namespace BookingSystem.Api.Models
         [Required]
         [DataMember(Name="events", EmitDefaultValue=false)]
         public List<EventDto> Events { get; set; }
-
-        /// <summary>
-        /// A sample instance built from the example values in the OAS document.
-        /// Generated controller stubs return this instead of deserializing a JSON string,
-        /// so the sample is a real, compile-time checked C# object.
-        /// Note: a model that (indirectly) references itself would recurse here; break the
-        /// cycle by hand if that ever happens.
-        /// </summary>
-        public static UserDto Sample => new UserDto
-        {
-            Id = default,
-            Name = "Bob",
-            Events = new List<EventDto> { global::BookingSystem.Api.Models.EventDto.Sample },
-        };
 
         /// <summary>
         /// Returns the string presentation of the object

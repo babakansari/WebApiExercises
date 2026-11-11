@@ -8,9 +8,11 @@ namespace BookingSystem.Api.Services
     /// </summary>
     public interface IBookingService
     {
+        /// <summary>Creates a new booking.</summary>
+        int CreateBooking(BookingPayload bookingPayload);
+
         /// <summary>Returns every user with the events the user is booked into.</summary>
         List<UserDto> GetUsers();
-
 
         /// <summary>Returns every event.</summary>
         List<EventDto> GetEvents();

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BookingSystem.Api.Data.Entities;
+using Newtonsoft.Json.Linq;
 
 namespace BookingSystem.Api.Data
 {
@@ -15,27 +17,26 @@ namespace BookingSystem.Api.Data
         private readonly List<User> _users = new List<User>();
         private readonly List<Event> _events = new List<Event>();
         private readonly List<Booking> _bookings = new List<Booking>();
-        private int _nextUserId = 1;
-        private int _nextEventId = 1;
-        private int _nextBookingId = 1;
+        private int _nextUserId;
+        private int _nextEventId;
+        private int _nextBookingId;
 
         /// <summary>
-        /// Creates the store and seeds it with sample data.
+        /// Creates the store and loads its initial data from <c>Data/BookingSystem.json</c>.
+        /// The id counters continue after the highest loaded id.
         /// </summary>
         public InMemoryDataStore()
         {
-            var alice = AddUser(new User { Name = "Alice" });
-            var bob = AddUser(new User { Name = "Bob" });
-            AddUser(new User { Name = "Carol" });
+            var path = Path.Combine(AppContext.BaseDirectory, "Data", "BookingSystem.json");
+            var data = JObject.Parse(File.ReadAllText(path));
 
-            var today = DateTime.UtcNow.Date;
-            var concert = AddEvent(new Event { Title = "Concert", Date = today.AddDays(7) });
-            var conference = AddEvent(new Event { Title = "Conference", Date = today.AddDays(14) });
-            AddEvent(new Event { Title = "Workshop", Date = today.AddDays(21) });
+            _users.AddRange(data["users"]?.ToObject<List<User>>() ?? new List<User>());
+            _events.AddRange(data["events"]?.ToObject<List<Event>>() ?? new List<Event>());
+            _bookings.AddRange(data["bookings"]?.ToObject<List<Booking>>() ?? new List<Booking>());
 
-            AddBooking(new Booking { UserId = alice.Id, EventId = concert.Id });
-            AddBooking(new Booking { UserId = alice.Id, EventId = conference.Id });
-            AddBooking(new Booking { UserId = bob.Id, EventId = concert.Id });
+            _nextUserId = _users.Select(u => u.Id).DefaultIfEmpty(0).Max() + 1;
+            _nextEventId = _events.Select(e => e.Id).DefaultIfEmpty(0).Max() + 1;
+            _nextBookingId = _bookings.Select(b => b.Id).DefaultIfEmpty(0).Max() + 1;
         }
 
         /// <inheritdoc />
@@ -131,6 +132,24 @@ namespace BookingSystem.Api.Data
                 booking.Id = _nextBookingId++;
                 _bookings.Add(booking);
                 return booking;
+            }
+        }
+        /// <inheritdoc />
+        public int CreateBooking(User theUser, Event theEvent)
+        {
+            ArgumentNullException.ThrowIfNull(theUser);
+            ArgumentNullException.ThrowIfNull(theEvent);
+
+            lock (_lock)
+            {
+                var booking = new Booking
+                {
+                    Id = _nextBookingId++,
+                    UserId = theUser.Id,
+                    EventId = theEvent.Id
+                };
+                _bookings.Add(booking);
+                return booking.Id;
             }
         }
     }

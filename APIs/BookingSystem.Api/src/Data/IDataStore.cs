@@ -43,5 +43,14 @@ namespace BookingSystem.Api.Data
 
         /// <summary>Adds a booking and assigns its id.</summary>
         Booking AddBooking(Booking booking);
+
+
+        /// <summary>
+        /// Creates a booking for the specified user and event.
+        /// </summary>
+        /// <param name="theUser">The user for whom to create the booking.</param>
+        /// <param name="theEvent">The event for which to create the booking.</param>
+        /// <returns>The ID of the created booking.</returns>
+        int CreateBooking(User theUser, Event theEvent);
     }
 }

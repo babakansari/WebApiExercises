@@ -47,10 +47,6 @@ namespace BookingSystem.Api.Controllers
         [SwaggerResponse(statusCode: 200, type: typeof(UserDto), description: "Successful response.")]
         public virtual Task<ActionResult<UserDto>> GetUserById([FromRoute (Name = "id")][Required]int id)
         {
-
-            //TODO: Replace this generated sample with the real implementation.
-            // Sample response built as a real C# object from the OAS examples; the models expose
-            // those examples through their generated Sample property.
             UserDto sample = _bookingService.GetUserById(id);
             return Task.FromResult<ActionResult<UserDto>>(StatusCode(200, sample));
         }

@@ -188,7 +188,7 @@
             "type" : "array"
           }
         },
-        "required" : [ "events", "name" ],
+        "required" : [ "events", "id", "name" ],
         "type" : "object"
       },
       "bookingPayload" : {
@@ -248,7 +248,7 @@
             "type" : "array"
           }
         },
-        "required" : [ "date", "title" ],
+        "required" : [ "date", "id", "title" ],
         "type" : "object"
       },
       "createResponse" : {

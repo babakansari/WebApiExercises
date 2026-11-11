@@ -125,6 +125,7 @@ components:
               title: "Sample Event"
               date: "2024-06-01T10:00:00Z"
       required:
+        - id
         - name
         - events
     bookingPayload:
@@ -163,7 +164,8 @@ components:
                   title: "Sample Event"
                   date: "2024-06-01T10:00:00Z"
       required:
-        - title       
+        - id
+        - title
         - date
     createResponse:
       type: object

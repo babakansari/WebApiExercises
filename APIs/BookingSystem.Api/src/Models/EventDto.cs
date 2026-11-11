@@ -29,8 +29,9 @@ namespace BookingSystem.Api.Models
         /// <summary>
         /// Gets or Sets Id
         /// </summary>
+        [Required]
         [DataMember(Name="id", EmitDefaultValue=true)]
-        public int? Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Gets or Sets Title
@@ -54,21 +55,6 @@ namespace BookingSystem.Api.Models
         /* <example>[{&quot;name&quot;:&quot;Bob&quot;,&quot;events&quot;:[{&quot;id&quot;:456,&quot;title&quot;:&quot;Sample Event&quot;,&quot;date&quot;:&quot;2024-06-01T10:00:00Z&quot;}]}]</example> */
         [DataMember(Name="users", EmitDefaultValue=false)]
         public List<UserDto> Users { get; set; }
-
-        /// <summary>
-        /// A sample instance built from the example values in the OAS document.
-        /// Generated controller stubs return this instead of deserializing a JSON string,
-        /// so the sample is a real, compile-time checked C# object.
-        /// Note: a model that (indirectly) references itself would recurse here; break the
-        /// cycle by hand if that ever happens.
-        /// </summary>
-        public static EventDto Sample => new EventDto
-        {
-            Id = default,
-            Title = "Sample Event",
-            Date = System.DateTime.Parse("2024-06-01T10:00Z", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AdjustToUniversal),
-            Users = new List<UserDto> { global::BookingSystem.Api.Models.UserDto.Sample },
-        };
 
         /// <summary>
         /// Returns the string presentation of the object
