@@ -26,7 +26,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int32
       responses:
         '200':
           description: Successful response.
@@ -121,7 +122,7 @@ components:
           items:
             $ref: '#/components/schemas/event'
           example:
-            - id: "456"
+            - id: 456
               title: "Sample Event"
               date: "2024-06-01T10:00:00Z"
       required:
@@ -132,10 +133,10 @@ components:
       properties:
         userName:
           type: string
-          example: "123"
+          example: "Tom"
         eventTitle:
           type: string
-          example: "456"
+          example: "Sample Event"
       required:
         - userName
         - eventTitle
@@ -143,8 +144,8 @@ components:
       type: object
       properties:
         id:
-          type: string
-          example: "123"
+          type: integer
+          example: 123
         name:
           type: string
           example: "John Doe"
@@ -155,8 +156,8 @@ components:
       type: object
       properties:
         id:
-          type: string
-          example: "456"
+          type: integer
+          example: 456
         title:
           type: string
           example: "Sample Event"
@@ -172,14 +173,14 @@ components:
       type: object
       properties:
         id:
-          type: string
-          example: "789"
+          type: integer
+          example: 789
         userId:
-          type: string
-          example: "123"
+          type: integer
+          example: 123
         eventId:
-          type: string
-          example: "456"
+          type: integer
+          example: 456
       required:
        - id
        - userId
