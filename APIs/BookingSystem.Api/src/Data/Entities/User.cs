@@ -18,7 +18,7 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using BookingSystem.Api.Converters;
 
-namespace BookingSystem.Api.Models
+namespace BookingSystem.Api.Data.Entities
 { 
     /// <summary>
     /// 

@@ -26,6 +26,7 @@ using BookingSystem.Api.Data;
 using BookingSystem.Api.Filters;
 using BookingSystem.Api.OpenApi;
 using BookingSystem.Api.Formatters;
+using BookingSystem.Api.Services;
 
 namespace BookingSystem.Api
 {
@@ -124,6 +125,7 @@ namespace BookingSystem.Api
                 services
                     .AddSwaggerGenNewtonsoftSupport();
                 services.AddSingleton<IDataStore, InMemoryDataStore>();
+                services.AddScoped<IBookingService, BookingService>();
         }
 
         /// <summary>

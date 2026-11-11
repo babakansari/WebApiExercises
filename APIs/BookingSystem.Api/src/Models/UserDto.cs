@@ -24,31 +24,29 @@ namespace BookingSystem.Api.Models
     /// 
     /// </summary>
     [DataContract]
-    public partial class Event : IEquatable<Event>
+    public partial class UserDto : IEquatable<UserDto>
     {
         /// <summary>
         /// Gets or Sets Id
         /// </summary>
-        /* <example>456</example> */
-        [Required]
         [DataMember(Name="id", EmitDefaultValue=true)]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
-        /// Gets or Sets Title
+        /// Gets or Sets Name
         /// </summary>
-        /* <example>Sample Event</example> */
+        /* <example>Bob</example> */
         [Required]
-        [DataMember(Name="title", EmitDefaultValue=false)]
-        public string Title { get; set; }
+        [DataMember(Name="name", EmitDefaultValue=false)]
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets or Sets Date
+        /// Gets or Sets Events
         /// </summary>
-        /* <example>2024-06-01T10:00Z</example> */
+        /* <example>[{&quot;id&quot;:456,&quot;title&quot;:&quot;Sample Event&quot;,&quot;date&quot;:&quot;2024-06-01T10:00:00Z&quot;}]</example> */
         [Required]
-        [DataMember(Name="date", EmitDefaultValue=true)]
-        public DateTime Date { get; set; }
+        [DataMember(Name="events", EmitDefaultValue=false)]
+        public List<EventDto> Events { get; set; }
 
         /// <summary>
         /// A sample instance built from the example values in the OAS document.
@@ -57,11 +55,11 @@ namespace BookingSystem.Api.Models
         /// Note: a model that (indirectly) references itself would recurse here; break the
         /// cycle by hand if that ever happens.
         /// </summary>
-        public static Event Sample => new Event
+        public static UserDto Sample => new UserDto
         {
-            Id = 456,
-            Title = "Sample Event",
-            Date = System.DateTime.Parse("2024-06-01T10:00Z", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AdjustToUniversal),
+            Id = default,
+            Name = "Bob",
+            Events = new List<EventDto> { global::BookingSystem.Api.Models.EventDto.Sample },
         };
 
         /// <summary>
@@ -71,10 +69,10 @@ namespace BookingSystem.Api.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class Event {\n");
+            sb.Append("class UserDto {\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
-            sb.Append("  Title: ").Append(Title).Append("\n");
-            sb.Append("  Date: ").Append(Date).Append("\n");
+            sb.Append("  Name: ").Append(Name).Append("\n");
+            sb.Append("  Events: ").Append(Events).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -97,15 +95,15 @@ namespace BookingSystem.Api.Models
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((Event)obj);
+            return obj.GetType() == GetType() && Equals((UserDto)obj);
         }
 
         /// <summary>
-        /// Returns true if Event instances are equal
+        /// Returns true if UserDto instances are equal
         /// </summary>
-        /// <param name="other">Instance of Event to be compared</param>
+        /// <param name="other">Instance of UserDto to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Event other)
+        public bool Equals(UserDto other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -117,14 +115,15 @@ namespace BookingSystem.Api.Models
                     Id.Equals(other.Id)
                 ) && 
                 (
-                    Title == other.Title ||
-                    Title != null &&
-                    Title.Equals(other.Title)
+                    Name == other.Name ||
+                    Name != null &&
+                    Name.Equals(other.Name)
                 ) && 
                 (
-                    Date == other.Date ||
-                    
-                    Date.Equals(other.Date)
+                    Events == other.Events ||
+                    Events != null &&
+                    other.Events != null &&
+                    Events.SequenceEqual(other.Events)
                 );
         }
 
@@ -140,10 +139,10 @@ namespace BookingSystem.Api.Models
                 // Suitable nullity checks etc, of course :)
                     
                     hashCode = hashCode * 59 + Id.GetHashCode();
-                    if (Title != null)
-                    hashCode = hashCode * 59 + Title.GetHashCode();
-                    
-                    hashCode = hashCode * 59 + Date.GetHashCode();
+                    if (Name != null)
+                    hashCode = hashCode * 59 + Name.GetHashCode();
+                    if (Events != null)
+                    hashCode = hashCode * 59 + Events.GetHashCode();
                 return hashCode;
             }
         }
@@ -151,12 +150,12 @@ namespace BookingSystem.Api.Models
         #region Operators
         #pragma warning disable 1591
 
-        public static bool operator ==(Event left, Event right)
+        public static bool operator ==(UserDto left, UserDto right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(Event left, Event right)
+        public static bool operator !=(UserDto left, UserDto right)
         {
             return !Equals(left, right);
         }

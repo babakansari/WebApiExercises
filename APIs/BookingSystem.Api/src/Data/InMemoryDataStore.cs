@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BookingSystem.Api.Models;
+using BookingSystem.Api.Data.Entities;
 
 namespace BookingSystem.Api.Data
 {

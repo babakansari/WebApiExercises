@@ -18,29 +18,37 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using BookingSystem.Api.Converters;
 
-namespace BookingSystem.Api.Models
+namespace BookingSystem.Api.Data.Entities
 { 
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
-    public partial class UserDetails : IEquatable<UserDetails>
+    public partial class Booking : IEquatable<Booking>
     {
         /// <summary>
-        /// Gets or Sets UserName
+        /// Gets or Sets Id
+        /// </summary>
+        /* <example>789</example> */
+        [Required]
+        [DataMember(Name="id", EmitDefaultValue=true)]
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or Sets UserId
         /// </summary>
         /* <example>123</example> */
         [Required]
-        [DataMember(Name="userName", EmitDefaultValue=false)]
-        public string UserName { get; set; }
+        [DataMember(Name="userId", EmitDefaultValue=true)]
+        public int UserId { get; set; }
 
         /// <summary>
-        /// Gets or Sets Event
+        /// Gets or Sets EventId
         /// </summary>
-        /* <example>[{&quot;id&quot;:456,&quot;title&quot;:&quot;Sample Event&quot;,&quot;date&quot;:&quot;2024-06-01T10:00:00Z&quot;}]</example> */
+        /* <example>456</example> */
         [Required]
-        [DataMember(Name="Event", EmitDefaultValue=false)]
-        public List<Event> Event { get; set; }
+        [DataMember(Name="eventId", EmitDefaultValue=true)]
+        public int EventId { get; set; }
 
         /// <summary>
         /// A sample instance built from the example values in the OAS document.
@@ -49,10 +57,11 @@ namespace BookingSystem.Api.Models
         /// Note: a model that (indirectly) references itself would recurse here; break the
         /// cycle by hand if that ever happens.
         /// </summary>
-        public static UserDetails Sample => new UserDetails
+        public static Booking Sample => new Booking
         {
-            UserName = "123",
-            Event = new List<Event> { global::BookingSystem.Api.Models.Event.Sample },
+            Id = 789,
+            UserId = 123,
+            EventId = 456,
         };
 
         /// <summary>
@@ -62,9 +71,10 @@ namespace BookingSystem.Api.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class UserDetails {\n");
-            sb.Append("  UserName: ").Append(UserName).Append("\n");
-            sb.Append("  Event: ").Append(Event).Append("\n");
+            sb.Append("class Booking {\n");
+            sb.Append("  Id: ").Append(Id).Append("\n");
+            sb.Append("  UserId: ").Append(UserId).Append("\n");
+            sb.Append("  EventId: ").Append(EventId).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -87,30 +97,34 @@ namespace BookingSystem.Api.Models
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((UserDetails)obj);
+            return obj.GetType() == GetType() && Equals((Booking)obj);
         }
 
         /// <summary>
-        /// Returns true if UserDetails instances are equal
+        /// Returns true if Booking instances are equal
         /// </summary>
-        /// <param name="other">Instance of UserDetails to be compared</param>
+        /// <param name="other">Instance of Booking to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(UserDetails other)
+        public bool Equals(Booking other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
 
             return 
                 (
-                    UserName == other.UserName ||
-                    UserName != null &&
-                    UserName.Equals(other.UserName)
+                    Id == other.Id ||
+                    
+                    Id.Equals(other.Id)
                 ) && 
                 (
-                    Event == other.Event ||
-                    Event != null &&
-                    other.Event != null &&
-                    Event.SequenceEqual(other.Event)
+                    UserId == other.UserId ||
+                    
+                    UserId.Equals(other.UserId)
+                ) && 
+                (
+                    EventId == other.EventId ||
+                    
+                    EventId.Equals(other.EventId)
                 );
         }
 
@@ -124,10 +138,12 @@ namespace BookingSystem.Api.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
-                    if (UserName != null)
-                    hashCode = hashCode * 59 + UserName.GetHashCode();
-                    if (Event != null)
-                    hashCode = hashCode * 59 + Event.GetHashCode();
+                    
+                    hashCode = hashCode * 59 + Id.GetHashCode();
+                    
+                    hashCode = hashCode * 59 + UserId.GetHashCode();
+                    
+                    hashCode = hashCode * 59 + EventId.GetHashCode();
                 return hashCode;
             }
         }
@@ -135,12 +151,12 @@ namespace BookingSystem.Api.Models
         #region Operators
         #pragma warning disable 1591
 
-        public static bool operator ==(UserDetails left, UserDetails right)
+        public static bool operator ==(Booking left, Booking right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(UserDetails left, UserDetails right)
+        public static bool operator !=(Booking left, Booking right)
         {
             return !Equals(left, right);
         }

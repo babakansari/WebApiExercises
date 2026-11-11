@@ -10,7 +10,7 @@
         <Nullable>annotations</Nullable>
         <AssemblyName>BookingSystem.Api</AssemblyName>
         <PackageId>BookingSystem.Api</PackageId>
-        <UserSecretsId>f0de77dd-52c5-42d6-8db8-174465b05371</UserSecretsId>
+        <UserSecretsId>db1ce4d5-2ae0-49b8-b767-60696b2b851a</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <DockerfileContext>..\..</DockerfileContext>
     </PropertyGroup>

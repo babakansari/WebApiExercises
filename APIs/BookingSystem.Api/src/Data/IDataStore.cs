@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using BookingSystem.Api.Models;
+using BookingSystem.Api.Data.Entities;
 
 namespace BookingSystem.Api.Data
 {

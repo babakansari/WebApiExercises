@@ -40,7 +40,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/userDetails"
+                  "$ref" : "#/components/schemas/userDto"
                 }
               }
             },
@@ -59,7 +59,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/getUsers_200_response"
+                  "items" : {
+                    "$ref" : "#/components/schemas/userDto"
+                  },
+                  "type" : "array"
                 }
               }
             },
@@ -70,7 +73,37 @@
         "tags" : [ "User" ]
       }
     },
-    "/events" : {
+    "/events/{id}" : {
+      "get" : {
+        "operationId" : "getEventById",
+        "parameters" : [ {
+          "explode" : false,
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/eventDto"
+                }
+              }
+            },
+            "description" : "Successful response."
+          }
+        },
+        "summary" : "Get event by ID",
+        "tags" : [ "Event" ]
+      }
+    },
+    "/events/list" : {
       "get" : {
         "operationId" : "getEvents",
         "responses" : {
@@ -78,7 +111,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/getEvents_200_response"
+                  "items" : {
+                    "$ref" : "#/components/schemas/eventDto"
+                  },
+                  "type" : "array"
                 }
               }
             },
@@ -86,33 +122,6 @@
           }
         },
         "summary" : "Get list of events",
-        "tags" : [ "Event" ]
-      },
-      "post" : {
-        "operationId" : "createEvent",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/event"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "201" : {
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/event"
-                }
-              }
-            },
-            "description" : "Event created successfully."
-          }
-        },
-        "summary" : "Create a new event",
         "tags" : [ "Event" ]
       }
     },
@@ -123,7 +132,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/createBooking"
+                "$ref" : "#/components/schemas/bookingPayload"
               }
             }
           },
@@ -134,7 +143,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/booking"
+                  "$ref" : "#/components/schemas/createResponse"
                 }
               }
             },
@@ -148,76 +157,71 @@
   },
   "components" : {
     "schemas" : {
-      "userDetails" : {
+      "userDto" : {
         "example" : {
-          "userName" : "123",
-          "Event" : [ {
+          "id" : 0,
+          "name" : "Bob",
+          "events" : [ {
             "id" : 456,
             "title" : "Sample Event",
             "date" : "2024-06-01T10:00:00Z"
           } ]
         },
         "properties" : {
-          "userName" : {
-            "example" : "123",
+          "id" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "name" : {
+            "example" : "Bob",
             "type" : "string"
           },
-          "Event" : {
+          "events" : {
             "example" : [ {
               "id" : 456,
               "title" : "Sample Event",
               "date" : "2024-06-01T10:00:00Z"
             } ],
             "items" : {
-              "$ref" : "#/components/schemas/event"
+              "$ref" : "#/components/schemas/eventDto"
             },
             "type" : "array"
           }
         },
-        "required" : [ "Event", "userName" ],
+        "required" : [ "events", "name" ],
         "type" : "object"
       },
-      "createBooking" : {
+      "bookingPayload" : {
         "properties" : {
-          "userName" : {
-            "example" : "Tom",
-            "type" : "string"
-          },
-          "eventTitle" : {
-            "example" : "Sample Event",
-            "type" : "string"
-          }
-        },
-        "required" : [ "eventTitle", "userName" ],
-        "type" : "object"
-      },
-      "user" : {
-        "example" : {
-          "id" : 123,
-          "name" : "John Doe"
-        },
-        "properties" : {
-          "id" : {
-            "example" : 123,
+          "userId" : {
+            "format" : "int32",
             "type" : "integer"
           },
-          "name" : {
-            "example" : "John Doe",
-            "type" : "string"
+          "eventId" : {
+            "format" : "int32",
+            "type" : "integer"
           }
         },
-        "required" : [ "id", "name" ],
+        "required" : [ "eventId", "userId" ],
         "type" : "object"
       },
-      "event" : {
+      "eventDto" : {
         "example" : {
-          "id" : 456,
+          "id" : 0,
           "title" : "Sample Event",
-          "date" : "2024-06-01T10:00:00Z"
+          "date" : "2024-06-01T10:00:00Z",
+          "users" : [ {
+            "name" : "Bob",
+            "events" : [ {
+              "id" : 456,
+              "title" : "Sample Event",
+              "date" : "2024-06-01T10:00:00Z"
+            } ]
+          } ]
         },
         "properties" : {
           "id" : {
-            "example" : 456,
+            "format" : "int32",
             "type" : "integer"
           },
           "title" : {
@@ -228,72 +232,33 @@
             "example" : "2024-06-01T10:00:00Z",
             "format" : "date-time",
             "type" : "string"
+          },
+          "users" : {
+            "example" : [ {
+              "name" : "Bob",
+              "events" : [ {
+                "id" : 456,
+                "title" : "Sample Event",
+                "date" : "2024-06-01T10:00:00Z"
+              } ]
+            } ],
+            "items" : {
+              "$ref" : "#/components/schemas/userDto"
+            },
+            "type" : "array"
           }
         },
-        "required" : [ "date", "id", "title" ],
+        "required" : [ "date", "title" ],
         "type" : "object"
       },
-      "booking" : {
+      "createResponse" : {
         "example" : {
-          "id" : 789,
-          "userId" : 123,
-          "eventId" : 456
+          "id" : 789
         },
         "properties" : {
           "id" : {
             "example" : 789,
             "type" : "integer"
-          },
-          "userId" : {
-            "example" : 123,
-            "type" : "integer"
-          },
-          "eventId" : {
-            "example" : 456,
-            "type" : "integer"
-          }
-        },
-        "required" : [ "eventId", "id", "userId" ],
-        "type" : "object"
-      },
-      "getUsers_200_response" : {
-        "example" : {
-          "users" : [ {
-            "id" : 123,
-            "name" : "John Doe"
-          }, {
-            "id" : 123,
-            "name" : "John Doe"
-          } ]
-        },
-        "properties" : {
-          "users" : {
-            "items" : {
-              "$ref" : "#/components/schemas/user"
-            },
-            "type" : "array"
-          }
-        },
-        "type" : "object"
-      },
-      "getEvents_200_response" : {
-        "example" : {
-          "events" : [ {
-            "id" : 456,
-            "title" : "Sample Event",
-            "date" : "2024-06-01T10:00:00Z"
-          }, {
-            "id" : 456,
-            "title" : "Sample Event",
-            "date" : "2024-06-01T10:00:00Z"
-          } ]
-        },
-        "properties" : {
-          "events" : {
-            "items" : {
-              "$ref" : "#/components/schemas/event"
-            },
-            "type" : "array"
           }
         },
         "type" : "object"

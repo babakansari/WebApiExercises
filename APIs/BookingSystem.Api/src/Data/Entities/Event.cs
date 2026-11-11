@@ -18,29 +18,37 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using BookingSystem.Api.Converters;
 
-namespace BookingSystem.Api.Models
+namespace BookingSystem.Api.Data.Entities
 { 
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
-    public partial class CreateBooking : IEquatable<CreateBooking>
+    public partial class Event : IEquatable<Event>
     {
         /// <summary>
-        /// Gets or Sets UserName
+        /// Gets or Sets Id
         /// </summary>
-        /* <example>Tom</example> */
+        /* <example>456</example> */
         [Required]
-        [DataMember(Name="userName", EmitDefaultValue=false)]
-        public string UserName { get; set; }
+        [DataMember(Name="id", EmitDefaultValue=true)]
+        public int Id { get; set; }
 
         /// <summary>
-        /// Gets or Sets EventTitle
+        /// Gets or Sets Title
         /// </summary>
         /* <example>Sample Event</example> */
         [Required]
-        [DataMember(Name="eventTitle", EmitDefaultValue=false)]
-        public string EventTitle { get; set; }
+        [DataMember(Name="title", EmitDefaultValue=false)]
+        public string Title { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Date
+        /// </summary>
+        /* <example>2024-06-01T10:00Z</example> */
+        [Required]
+        [DataMember(Name="date", EmitDefaultValue=true)]
+        public DateTime Date { get; set; }
 
         /// <summary>
         /// A sample instance built from the example values in the OAS document.
@@ -49,10 +57,11 @@ namespace BookingSystem.Api.Models
         /// Note: a model that (indirectly) references itself would recurse here; break the
         /// cycle by hand if that ever happens.
         /// </summary>
-        public static CreateBooking Sample => new CreateBooking
+        public static Event Sample => new Event
         {
-            UserName = "Tom",
-            EventTitle = "Sample Event",
+            Id = 456,
+            Title = "Sample Event",
+            Date = System.DateTime.Parse("2024-06-01T10:00Z", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AdjustToUniversal),
         };
 
         /// <summary>
@@ -62,9 +71,10 @@ namespace BookingSystem.Api.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class CreateBooking {\n");
-            sb.Append("  UserName: ").Append(UserName).Append("\n");
-            sb.Append("  EventTitle: ").Append(EventTitle).Append("\n");
+            sb.Append("class Event {\n");
+            sb.Append("  Id: ").Append(Id).Append("\n");
+            sb.Append("  Title: ").Append(Title).Append("\n");
+            sb.Append("  Date: ").Append(Date).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -87,29 +97,34 @@ namespace BookingSystem.Api.Models
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((CreateBooking)obj);
+            return obj.GetType() == GetType() && Equals((Event)obj);
         }
 
         /// <summary>
-        /// Returns true if CreateBooking instances are equal
+        /// Returns true if Event instances are equal
         /// </summary>
-        /// <param name="other">Instance of CreateBooking to be compared</param>
+        /// <param name="other">Instance of Event to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(CreateBooking other)
+        public bool Equals(Event other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
 
             return 
                 (
-                    UserName == other.UserName ||
-                    UserName != null &&
-                    UserName.Equals(other.UserName)
+                    Id == other.Id ||
+                    
+                    Id.Equals(other.Id)
                 ) && 
                 (
-                    EventTitle == other.EventTitle ||
-                    EventTitle != null &&
-                    EventTitle.Equals(other.EventTitle)
+                    Title == other.Title ||
+                    Title != null &&
+                    Title.Equals(other.Title)
+                ) && 
+                (
+                    Date == other.Date ||
+                    
+                    Date.Equals(other.Date)
                 );
         }
 
@@ -123,10 +138,12 @@ namespace BookingSystem.Api.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
-                    if (UserName != null)
-                    hashCode = hashCode * 59 + UserName.GetHashCode();
-                    if (EventTitle != null)
-                    hashCode = hashCode * 59 + EventTitle.GetHashCode();
+                    
+                    hashCode = hashCode * 59 + Id.GetHashCode();
+                    if (Title != null)
+                    hashCode = hashCode * 59 + Title.GetHashCode();
+                    
+                    hashCode = hashCode * 59 + Date.GetHashCode();
                 return hashCode;
             }
         }
@@ -134,12 +151,12 @@ namespace BookingSystem.Api.Models
         #region Operators
         #pragma warning disable 1591
 
-        public static bool operator ==(CreateBooking left, CreateBooking right)
+        public static bool operator ==(Event left, Event right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(CreateBooking left, CreateBooking right)
+        public static bool operator !=(Event left, Event right)
         {
             return !Equals(left, right);
         }

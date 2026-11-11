@@ -21,6 +21,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using BookingSystem.Api.Attributes;
 using BookingSystem.Api.Models;
+using BookingSystem.Api.Services;
 
 namespace BookingSystem.Api.Controllers
 { 
@@ -29,8 +30,10 @@ namespace BookingSystem.Api.Controllers
     /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
-    public class UserApiController : ControllerBase
+    public class UserApiController(IBookingService bookingService) : ControllerBase
     { 
+        IBookingService _bookingService = bookingService;
+
         /// <summary>
         /// Get user by ID
         /// </summary>
@@ -41,15 +44,15 @@ namespace BookingSystem.Api.Controllers
         [MapToApiVersion("1.0")]
         [ValidateModelState]
         [SwaggerOperation("GetUserById")]
-        [SwaggerResponse(statusCode: 200, type: typeof(UserDetails), description: "Successful response.")]
-        public virtual Task<ActionResult<UserDetails>> GetUserById([FromRoute (Name = "id")][Required]int id)
+        [SwaggerResponse(statusCode: 200, type: typeof(UserDto), description: "Successful response.")]
+        public virtual Task<ActionResult<UserDto>> GetUserById([FromRoute (Name = "id")][Required]int id)
         {
 
             //TODO: Replace this generated sample with the real implementation.
             // Sample response built as a real C# object from the OAS examples; the models expose
             // those examples through their generated Sample property.
-            UserDetails sample = global::BookingSystem.Api.Models.UserDetails.Sample;
-            return Task.FromResult<ActionResult<UserDetails>>(StatusCode(200, sample));
+            UserDto sample = _bookingService.GetUserById(id);
+            return Task.FromResult<ActionResult<UserDto>>(StatusCode(200, sample));
         }
 
         /// <summary>
@@ -61,15 +64,12 @@ namespace BookingSystem.Api.Controllers
         [MapToApiVersion("1.0")]
         [ValidateModelState]
         [SwaggerOperation("GetUsers")]
-        [SwaggerResponse(statusCode: 200, type: typeof(GetUsers200Response), description: "Successful response.")]
-        public virtual Task<ActionResult<GetUsers200Response>> GetUsers()
+        [SwaggerResponse(statusCode: 200, type: typeof(IEnumerable<UserDto>), description: "Successful response.")]
+        public virtual Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
 
-            //TODO: Replace this generated sample with the real implementation.
-            // Sample response built as a real C# object from the OAS examples; the models expose
-            // those examples through their generated Sample property.
-            GetUsers200Response sample = global::BookingSystem.Api.Models.GetUsers200Response.Sample;
-            return Task.FromResult<ActionResult<GetUsers200Response>>(StatusCode(200, sample));
+            IEnumerable<UserDto> sample = _bookingService.GetUsers();
+            return Task.FromResult<ActionResult<IEnumerable<UserDto>>>(StatusCode(200, sample));
         }
     }
 }

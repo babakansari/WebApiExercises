@@ -24,25 +24,21 @@ namespace BookingSystem.Api.Models
     /// 
     /// </summary>
     [DataContract]
-    public partial class GetEvents200Response : IEquatable<GetEvents200Response>
+    public partial class BookingDto : IEquatable<BookingDto>
     {
         /// <summary>
-        /// Gets or Sets Events
+        /// Gets or Sets User
         /// </summary>
-        [DataMember(Name="events", EmitDefaultValue=false)]
-        public List<Event> Events { get; set; }
+        [Required]
+        [DataMember(Name="user", EmitDefaultValue=false)]
+        public UserDto User { get; set; }
 
         /// <summary>
-        /// A sample instance built from the example values in the OAS document.
-        /// Generated controller stubs return this instead of deserializing a JSON string,
-        /// so the sample is a real, compile-time checked C# object.
-        /// Note: a model that (indirectly) references itself would recurse here; break the
-        /// cycle by hand if that ever happens.
+        /// Gets or Sets Event
         /// </summary>
-        public static GetEvents200Response Sample => new GetEvents200Response
-        {
-            Events = new List<Event> { global::BookingSystem.Api.Models.Event.Sample },
-        };
+        [Required]
+        [DataMember(Name="event", EmitDefaultValue=false)]
+        public EventDto Event { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -51,8 +47,9 @@ namespace BookingSystem.Api.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class GetEvents200Response {\n");
-            sb.Append("  Events: ").Append(Events).Append("\n");
+            sb.Append("class BookingDto {\n");
+            sb.Append("  User: ").Append(User).Append("\n");
+            sb.Append("  Event: ").Append(Event).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -75,25 +72,29 @@ namespace BookingSystem.Api.Models
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((GetEvents200Response)obj);
+            return obj.GetType() == GetType() && Equals((BookingDto)obj);
         }
 
         /// <summary>
-        /// Returns true if GetEvents200Response instances are equal
+        /// Returns true if BookingDto instances are equal
         /// </summary>
-        /// <param name="other">Instance of GetEvents200Response to be compared</param>
+        /// <param name="other">Instance of BookingDto to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(GetEvents200Response other)
+        public bool Equals(BookingDto other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
 
             return 
                 (
-                    Events == other.Events ||
-                    Events != null &&
-                    other.Events != null &&
-                    Events.SequenceEqual(other.Events)
+                    User == other.User ||
+                    User != null &&
+                    User.Equals(other.User)
+                ) && 
+                (
+                    Event == other.Event ||
+                    Event != null &&
+                    Event.Equals(other.Event)
                 );
         }
 
@@ -107,8 +108,10 @@ namespace BookingSystem.Api.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
-                    if (Events != null)
-                    hashCode = hashCode * 59 + Events.GetHashCode();
+                    if (User != null)
+                    hashCode = hashCode * 59 + User.GetHashCode();
+                    if (Event != null)
+                    hashCode = hashCode * 59 + Event.GetHashCode();
                 return hashCode;
             }
         }
@@ -116,12 +119,12 @@ namespace BookingSystem.Api.Models
         #region Operators
         #pragma warning disable 1591
 
-        public static bool operator ==(GetEvents200Response left, GetEvents200Response right)
+        public static bool operator ==(BookingDto left, BookingDto right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(GetEvents200Response left, GetEvents200Response right)
+        public static bool operator !=(BookingDto left, BookingDto right)
         {
             return !Equals(left, right);
         }

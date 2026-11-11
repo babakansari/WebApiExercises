@@ -24,13 +24,14 @@ namespace BookingSystem.Api.Models
     /// 
     /// </summary>
     [DataContract]
-    public partial class GetUsers200Response : IEquatable<GetUsers200Response>
+    public partial class CreateResponse : IEquatable<CreateResponse>
     {
         /// <summary>
-        /// Gets or Sets Users
+        /// Gets or Sets Id
         /// </summary>
-        [DataMember(Name="users", EmitDefaultValue=false)]
-        public List<User> Users { get; set; }
+        /* <example>789</example> */
+        [DataMember(Name="id", EmitDefaultValue=true)]
+        public int? Id { get; set; }
 
         /// <summary>
         /// A sample instance built from the example values in the OAS document.
@@ -39,9 +40,9 @@ namespace BookingSystem.Api.Models
         /// Note: a model that (indirectly) references itself would recurse here; break the
         /// cycle by hand if that ever happens.
         /// </summary>
-        public static GetUsers200Response Sample => new GetUsers200Response
+        public static CreateResponse Sample => new CreateResponse
         {
-            Users = new List<User> { global::BookingSystem.Api.Models.User.Sample },
+            Id = 789,
         };
 
         /// <summary>
@@ -51,8 +52,8 @@ namespace BookingSystem.Api.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class GetUsers200Response {\n");
-            sb.Append("  Users: ").Append(Users).Append("\n");
+            sb.Append("class CreateResponse {\n");
+            sb.Append("  Id: ").Append(Id).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -75,25 +76,24 @@ namespace BookingSystem.Api.Models
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((GetUsers200Response)obj);
+            return obj.GetType() == GetType() && Equals((CreateResponse)obj);
         }
 
         /// <summary>
-        /// Returns true if GetUsers200Response instances are equal
+        /// Returns true if CreateResponse instances are equal
         /// </summary>
-        /// <param name="other">Instance of GetUsers200Response to be compared</param>
+        /// <param name="other">Instance of CreateResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(GetUsers200Response other)
+        public bool Equals(CreateResponse other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
 
             return 
                 (
-                    Users == other.Users ||
-                    Users != null &&
-                    other.Users != null &&
-                    Users.SequenceEqual(other.Users)
+                    Id == other.Id ||
+                    
+                    Id.Equals(other.Id)
                 );
         }
 
@@ -107,8 +107,8 @@ namespace BookingSystem.Api.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
-                    if (Users != null)
-                    hashCode = hashCode * 59 + Users.GetHashCode();
+                    
+                    hashCode = hashCode * 59 + Id.GetHashCode();
                 return hashCode;
             }
         }
@@ -116,12 +116,12 @@ namespace BookingSystem.Api.Models
         #region Operators
         #pragma warning disable 1591
 
-        public static bool operator ==(GetUsers200Response left, GetUsers200Response right)
+        public static bool operator ==(CreateResponse left, CreateResponse right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(GetUsers200Response left, GetUsers200Response right)
+        public static bool operator !=(CreateResponse left, CreateResponse right)
         {
             return !Equals(left, right);
         }

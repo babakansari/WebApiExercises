@@ -34,7 +34,7 @@ namespace BookingSystem.Api.Controllers
         /// <summary>
         /// Create a new booking
         /// </summary>
-        /// <param name="createBooking"></param>
+        /// <param name="bookingPayload"></param>
         /// <response code="201">Booking created successfully.</response>
         [HttpPost]
         [Route("/api/v{version:apiVersion}/bookings")]
@@ -42,15 +42,15 @@ namespace BookingSystem.Api.Controllers
         [Consumes("application/json")]
         [ValidateModelState]
         [SwaggerOperation("CreateBooking")]
-        [SwaggerResponse(statusCode: 201, type: typeof(Booking), description: "Booking created successfully.")]
-        public virtual Task<ActionResult<Booking>> CreateBooking([FromBody]CreateBooking createBooking)
+        [SwaggerResponse(statusCode: 201, type: typeof(CreateResponse), description: "Booking created successfully.")]
+        public virtual Task<ActionResult<CreateResponse>> CreateBooking([FromBody]BookingPayload bookingPayload)
         {
 
             //TODO: Replace this generated sample with the real implementation.
             // Sample response built as a real C# object from the OAS examples; the models expose
             // those examples through their generated Sample property.
-            Booking sample = global::BookingSystem.Api.Models.Booking.Sample;
-            return Task.FromResult<ActionResult<Booking>>(StatusCode(201, sample));
+            CreateResponse sample = global::BookingSystem.Api.Models.CreateResponse.Sample;
+            return Task.FromResult<ActionResult<CreateResponse>>(StatusCode(201, sample));
         }
     }
 }

@@ -21,6 +21,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using BookingSystem.Api.Attributes;
 using BookingSystem.Api.Models;
+using BookingSystem.Api.Services;
 
 namespace BookingSystem.Api.Controllers
 { 
@@ -29,28 +30,28 @@ namespace BookingSystem.Api.Controllers
     /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
-    public class EventApiController : ControllerBase
+    public class EventApiController(IBookingService bookingService) : ControllerBase
     { 
+        IBookingService _bookingService = bookingService;
         /// <summary>
-        /// Create a new event
+        /// Get event by ID
         /// </summary>
-        /// <param name="varEvent"></param>
-        /// <response code="201">Event created successfully.</response>
-        [HttpPost]
-        [Route("/api/v{version:apiVersion}/events")]
+        /// <param name="id"></param>
+        /// <response code="200">Successful response.</response>
+        [HttpGet]
+        [Route("/api/v{version:apiVersion}/events/{id}")]
         [MapToApiVersion("1.0")]
-        [Consumes("application/json")]
         [ValidateModelState]
-        [SwaggerOperation("CreateEvent")]
-        [SwaggerResponse(statusCode: 201, type: typeof(Event), description: "Event created successfully.")]
-        public virtual Task<ActionResult<Event>> CreateEvent([FromBody]Event varEvent)
+        [SwaggerOperation("GetEventById")]
+        [SwaggerResponse(statusCode: 200, type: typeof(EventDto), description: "Successful response.")]
+        public virtual Task<ActionResult<EventDto>> GetEventById([FromRoute (Name = "id")][Required]int id)
         {
 
             //TODO: Replace this generated sample with the real implementation.
             // Sample response built as a real C# object from the OAS examples; the models expose
             // those examples through their generated Sample property.
-            Event sample = global::BookingSystem.Api.Models.Event.Sample;
-            return Task.FromResult<ActionResult<Event>>(StatusCode(201, sample));
+            EventDto sample = _bookingService.GetEventById(id);
+            return Task.FromResult<ActionResult<EventDto>>(StatusCode(200, sample));
         }
 
         /// <summary>
@@ -58,19 +59,19 @@ namespace BookingSystem.Api.Controllers
         /// </summary>
         /// <response code="200">Successful response.</response>
         [HttpGet]
-        [Route("/api/v{version:apiVersion}/events")]
+        [Route("/api/v{version:apiVersion}/events/list")]
         [MapToApiVersion("1.0")]
         [ValidateModelState]
         [SwaggerOperation("GetEvents")]
-        [SwaggerResponse(statusCode: 200, type: typeof(GetEvents200Response), description: "Successful response.")]
-        public virtual Task<ActionResult<GetEvents200Response>> GetEvents()
+        [SwaggerResponse(statusCode: 200, type: typeof(List<EventDto>), description: "Successful response.")]
+        public virtual Task<ActionResult<List<EventDto>>> GetEvents()
         {
 
             //TODO: Replace this generated sample with the real implementation.
             // Sample response built as a real C# object from the OAS examples; the models expose
             // those examples through their generated Sample property.
-            GetEvents200Response sample = global::BookingSystem.Api.Models.GetEvents200Response.Sample;
-            return Task.FromResult<ActionResult<GetEvents200Response>>(StatusCode(200, sample));
+            List<EventDto> sample = _bookingService.GetEvents();
+            return Task.FromResult<ActionResult<List<EventDto>>>(StatusCode(200, sample));
         }
     }
 }

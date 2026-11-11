@@ -24,31 +24,36 @@ namespace BookingSystem.Api.Models
     /// 
     /// </summary>
     [DataContract]
-    public partial class Booking : IEquatable<Booking>
+    public partial class EventDto : IEquatable<EventDto>
     {
         /// <summary>
         /// Gets or Sets Id
         /// </summary>
-        /* <example>789</example> */
-        [Required]
         [DataMember(Name="id", EmitDefaultValue=true)]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
-        /// Gets or Sets UserId
+        /// Gets or Sets Title
         /// </summary>
-        /* <example>123</example> */
+        /* <example>Sample Event</example> */
         [Required]
-        [DataMember(Name="userId", EmitDefaultValue=true)]
-        public int UserId { get; set; }
+        [DataMember(Name="title", EmitDefaultValue=false)]
+        public string Title { get; set; }
 
         /// <summary>
-        /// Gets or Sets EventId
+        /// Gets or Sets Date
         /// </summary>
-        /* <example>456</example> */
+        /* <example>2024-06-01T10:00Z</example> */
         [Required]
-        [DataMember(Name="eventId", EmitDefaultValue=true)]
-        public int EventId { get; set; }
+        [DataMember(Name="date", EmitDefaultValue=true)]
+        public DateTime Date { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Users
+        /// </summary>
+        /* <example>[{&quot;name&quot;:&quot;Bob&quot;,&quot;events&quot;:[{&quot;id&quot;:456,&quot;title&quot;:&quot;Sample Event&quot;,&quot;date&quot;:&quot;2024-06-01T10:00:00Z&quot;}]}]</example> */
+        [DataMember(Name="users", EmitDefaultValue=false)]
+        public List<UserDto> Users { get; set; }
 
         /// <summary>
         /// A sample instance built from the example values in the OAS document.
@@ -57,11 +62,12 @@ namespace BookingSystem.Api.Models
         /// Note: a model that (indirectly) references itself would recurse here; break the
         /// cycle by hand if that ever happens.
         /// </summary>
-        public static Booking Sample => new Booking
+        public static EventDto Sample => new EventDto
         {
-            Id = 789,
-            UserId = 123,
-            EventId = 456,
+            Id = default,
+            Title = "Sample Event",
+            Date = System.DateTime.Parse("2024-06-01T10:00Z", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AdjustToUniversal),
+            Users = new List<UserDto> { global::BookingSystem.Api.Models.UserDto.Sample },
         };
 
         /// <summary>
@@ -71,10 +77,11 @@ namespace BookingSystem.Api.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class Booking {\n");
+            sb.Append("class EventDto {\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
-            sb.Append("  UserId: ").Append(UserId).Append("\n");
-            sb.Append("  EventId: ").Append(EventId).Append("\n");
+            sb.Append("  Title: ").Append(Title).Append("\n");
+            sb.Append("  Date: ").Append(Date).Append("\n");
+            sb.Append("  Users: ").Append(Users).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -97,15 +104,15 @@ namespace BookingSystem.Api.Models
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((Booking)obj);
+            return obj.GetType() == GetType() && Equals((EventDto)obj);
         }
 
         /// <summary>
-        /// Returns true if Booking instances are equal
+        /// Returns true if EventDto instances are equal
         /// </summary>
-        /// <param name="other">Instance of Booking to be compared</param>
+        /// <param name="other">Instance of EventDto to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Booking other)
+        public bool Equals(EventDto other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -117,14 +124,20 @@ namespace BookingSystem.Api.Models
                     Id.Equals(other.Id)
                 ) && 
                 (
-                    UserId == other.UserId ||
-                    
-                    UserId.Equals(other.UserId)
+                    Title == other.Title ||
+                    Title != null &&
+                    Title.Equals(other.Title)
                 ) && 
                 (
-                    EventId == other.EventId ||
+                    Date == other.Date ||
                     
-                    EventId.Equals(other.EventId)
+                    Date.Equals(other.Date)
+                ) && 
+                (
+                    Users == other.Users ||
+                    Users != null &&
+                    other.Users != null &&
+                    Users.SequenceEqual(other.Users)
                 );
         }
 
@@ -140,10 +153,12 @@ namespace BookingSystem.Api.Models
                 // Suitable nullity checks etc, of course :)
                     
                     hashCode = hashCode * 59 + Id.GetHashCode();
+                    if (Title != null)
+                    hashCode = hashCode * 59 + Title.GetHashCode();
                     
-                    hashCode = hashCode * 59 + UserId.GetHashCode();
-                    
-                    hashCode = hashCode * 59 + EventId.GetHashCode();
+                    hashCode = hashCode * 59 + Date.GetHashCode();
+                    if (Users != null)
+                    hashCode = hashCode * 59 + Users.GetHashCode();
                 return hashCode;
             }
         }
@@ -151,12 +166,12 @@ namespace BookingSystem.Api.Models
         #region Operators
         #pragma warning disable 1591
 
-        public static bool operator ==(Booking left, Booking right)
+        public static bool operator ==(EventDto left, EventDto right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(Booking left, Booking right)
+        public static bool operator !=(EventDto left, EventDto right)
         {
             return !Equals(left, right);
         }
