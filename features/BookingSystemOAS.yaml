@@ -3,9 +3,6 @@ info:
   title: Booking API
   version: 1.0.0
   description: API for booking a user to an event.
-  # Read by generate-webapi.sh: the root namespace / package of the generated code. Avoids "Booking"
-  # so the namespace does not shadow the Booking model (CS0118).
-  x-package-name: BookingSystem.Api
 servers:
   - url: https://api.example.com/api/v1
   - url: http://localhost:3000/api/v1
