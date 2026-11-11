@@ -1,0 +1,303 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "description" : "API for booking a user to an event.",
+    "title" : "Booking API",
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "https://api.example.com/api/v1"
+  }, {
+    "url" : "http://localhost:3000/api/v1"
+  } ],
+  "tags" : [ {
+    "description" : "Operations related to users.",
+    "name" : "User"
+  }, {
+    "description" : "Operations related to booking.",
+    "name" : "Booking"
+  }, {
+    "description" : "Operations related to events.",
+    "name" : "Event"
+  } ],
+  "paths" : {
+    "/users/{id}" : {
+      "get" : {
+        "operationId" : "getUserById",
+        "parameters" : [ {
+          "explode" : false,
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userDetails"
+                }
+              }
+            },
+            "description" : "Successful response."
+          }
+        },
+        "summary" : "Get user by ID",
+        "tags" : [ "User" ]
+      }
+    },
+    "/users/list" : {
+      "get" : {
+        "operationId" : "getUsers",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/getUsers_200_response"
+                }
+              }
+            },
+            "description" : "Successful response."
+          }
+        },
+        "summary" : "Get list of users",
+        "tags" : [ "User" ]
+      }
+    },
+    "/events" : {
+      "get" : {
+        "operationId" : "getEvents",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/getEvents_200_response"
+                }
+              }
+            },
+            "description" : "Successful response."
+          }
+        },
+        "summary" : "Get list of events",
+        "tags" : [ "Event" ]
+      },
+      "post" : {
+        "operationId" : "createEvent",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/event"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/event"
+                }
+              }
+            },
+            "description" : "Event created successfully."
+          }
+        },
+        "summary" : "Create a new event",
+        "tags" : [ "Event" ]
+      }
+    },
+    "/bookings" : {
+      "post" : {
+        "operationId" : "createBooking",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/createBooking"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/booking"
+                }
+              }
+            },
+            "description" : "Booking created successfully."
+          }
+        },
+        "summary" : "Create a new booking",
+        "tags" : [ "Booking" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "userDetails" : {
+        "example" : {
+          "userName" : "123",
+          "Event" : [ {
+            "id" : 456,
+            "title" : "Sample Event",
+            "date" : "2024-06-01T10:00:00Z"
+          } ]
+        },
+        "properties" : {
+          "userName" : {
+            "example" : "123",
+            "type" : "string"
+          },
+          "Event" : {
+            "example" : [ {
+              "id" : 456,
+              "title" : "Sample Event",
+              "date" : "2024-06-01T10:00:00Z"
+            } ],
+            "items" : {
+              "$ref" : "#/components/schemas/event"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "Event", "userName" ],
+        "type" : "object"
+      },
+      "createBooking" : {
+        "properties" : {
+          "userName" : {
+            "example" : "Tom",
+            "type" : "string"
+          },
+          "eventTitle" : {
+            "example" : "Sample Event",
+            "type" : "string"
+          }
+        },
+        "required" : [ "eventTitle", "userName" ],
+        "type" : "object"
+      },
+      "user" : {
+        "example" : {
+          "id" : 123,
+          "name" : "John Doe"
+        },
+        "properties" : {
+          "id" : {
+            "example" : 123,
+            "type" : "integer"
+          },
+          "name" : {
+            "example" : "John Doe",
+            "type" : "string"
+          }
+        },
+        "required" : [ "id", "name" ],
+        "type" : "object"
+      },
+      "event" : {
+        "example" : {
+          "id" : 456,
+          "title" : "Sample Event",
+          "date" : "2024-06-01T10:00:00Z"
+        },
+        "properties" : {
+          "id" : {
+            "example" : 456,
+            "type" : "integer"
+          },
+          "title" : {
+            "example" : "Sample Event",
+            "type" : "string"
+          },
+          "date" : {
+            "example" : "2024-06-01T10:00:00Z",
+            "format" : "date-time",
+            "type" : "string"
+          }
+        },
+        "required" : [ "date", "id", "title" ],
+        "type" : "object"
+      },
+      "booking" : {
+        "example" : {
+          "id" : 789,
+          "userId" : 123,
+          "eventId" : 456
+        },
+        "properties" : {
+          "id" : {
+            "example" : 789,
+            "type" : "integer"
+          },
+          "userId" : {
+            "example" : 123,
+            "type" : "integer"
+          },
+          "eventId" : {
+            "example" : 456,
+            "type" : "integer"
+          }
+        },
+        "required" : [ "eventId", "id", "userId" ],
+        "type" : "object"
+      },
+      "getUsers_200_response" : {
+        "example" : {
+          "users" : [ {
+            "id" : 123,
+            "name" : "John Doe"
+          }, {
+            "id" : 123,
+            "name" : "John Doe"
+          } ]
+        },
+        "properties" : {
+          "users" : {
+            "items" : {
+              "$ref" : "#/components/schemas/user"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "getEvents_200_response" : {
+        "example" : {
+          "events" : [ {
+            "id" : 456,
+            "title" : "Sample Event",
+            "date" : "2024-06-01T10:00:00Z"
+          }, {
+            "id" : 456,
+            "title" : "Sample Event",
+            "date" : "2024-06-01T10:00:00Z"
+          } ]
+        },
+        "properties" : {
+          "events" : {
+            "items" : {
+              "$ref" : "#/components/schemas/event"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      }
+    }
+  }
+}
