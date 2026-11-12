@@ -46,12 +46,16 @@ namespace BookingSystem.Api.Controllers
         [SwaggerResponse(statusCode: 200, type: typeof(EventDto), description: "Successful response.")]
         public virtual Task<ActionResult<EventDto>> GetEventById([FromRoute (Name = "id")][Required]int id)
         {
+            var eventDto = _bookingService.GetEventById(id);
 
-            //TODO: Replace this generated sample with the real implementation.
-            // Sample response built as a real C# object from the OAS examples; the models expose
-            // those examples through their generated Sample property.
-            EventDto sample = _bookingService.GetEventById(id);
-            return Task.FromResult<ActionResult<EventDto>>(StatusCode(200, sample));
+            if (eventDto is null)
+            {
+                return Task.FromResult<ActionResult<EventDto>>(
+                    Problem(statusCode: StatusCodes.Status404NotFound,
+                            title: "Event not found"));
+            }
+
+            return Task.FromResult<ActionResult<EventDto>>(Ok(eventDto));
         }
 
         /// <summary>

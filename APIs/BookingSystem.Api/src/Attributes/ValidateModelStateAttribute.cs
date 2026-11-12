@@ -45,7 +45,7 @@ namespace BookingSystem.Api.Attributes
 
             if (!context.ModelState.IsValid)
             {
-                context.Result = new BadRequestObjectResult(context.ModelState);
+                context.Result = new BadRequestObjectResult(new ValidationProblemDetails(context.ModelState));
             }
         }
 

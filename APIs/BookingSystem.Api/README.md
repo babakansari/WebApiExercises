@@ -54,6 +54,13 @@ InMemory provider keeps data only for the lifetime of the process; it is intende
 development and testing, not durable production storage. Set the provider back to `InMemory`
 to restore the default.
 
+## Error responses
+
+Unhandled request exceptions return a generic `500` Problem Details response in all environments;
+exception details are logged on the server rather than sent to clients. Invalid model input returns
+`400` validation Problem Details. Status codes without a response body, such as an unknown route,
+also return Problem Details when the request accepts JSON.
+
 ## Run in Docker
 
 ```

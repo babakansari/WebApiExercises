@@ -128,6 +128,7 @@ namespace BookingSystem.Api
                     .AddSwaggerGenNewtonsoftSupport();
                 services.AddBookingSystemDataSource(Configuration);
                 services.AddScoped<IBookingService, BookingService>();
+                services.AddProblemDetails();
         }
 
         /// <summary>
@@ -145,11 +146,10 @@ namespace BookingSystem.Api
                 }
             }
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
+            app.UseExceptionHandler();
+            app.UseStatusCodePages();
+
+            if (!env.IsDevelopment())
             {
                 app.UseHsts();
             }
